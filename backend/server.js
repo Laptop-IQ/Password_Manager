@@ -28,8 +28,6 @@ const requiredProductionEnv = [
   "MONGODB_URI",
   "JWT_SECRET",
   "CLIENT_URL",
-  "SUPABASE_URL",
-  "SUPABASE_KEY",
 ];
 
 if (IS_PRODUCTION) {
