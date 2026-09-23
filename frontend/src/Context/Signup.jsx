@@ -1160,6 +1160,15 @@ const Signup = () => {
               </Link>
             </p>
           </div>
+
+          {/* =================================================
+              ANTI-PHISHING TRUST NOTE
+          ================================================== */}
+
+          <p className="relative z-20 mt-5 text-center text-[11px] leading-relaxed text-gray-400">
+            🔒 Always check the address bar before creating your account. We
+            will never email, call, or text you asking for your password.
+          </p>
         </div>
       </section>
     </main>

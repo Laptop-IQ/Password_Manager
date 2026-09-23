@@ -45,6 +45,78 @@ const getErrorMessage = (
 };
 
 /* ============================================================
+   ANTI-PHISHING: URL SAFETY CHECK
+   Flags entries that are plain HTTP (not encrypted) or whose
+   domain looks like it's impersonating a well-known brand
+   (e.g. "paypa1.com", "go0gle-secure.com").
+============================================================ */
+
+const WATCHED_BRANDS = [
+  "google",
+  "paypal",
+  "amazon",
+  "apple",
+  "microsoft",
+  "facebook",
+  "instagram",
+  "netflix",
+  "bank",
+  "chase",
+  "wellsfargo",
+  "coinbase",
+  "binance",
+];
+
+const normalizeHomoglyphs = (s) =>
+  s
+    .toLowerCase()
+    .replace(/1/g, "l")
+    .replace(/0/g, "o")
+    .replace(/5/g, "s")
+    .replace(/3/g, "e")
+    .replace(/4/g, "a")
+    .replace(/rn/g, "m");
+
+const getUrlWarning = (rawUrl) => {
+  if (!rawUrl) return null;
+
+  let hostname = "";
+  try {
+    const withScheme = /^https?:\/\//i.test(rawUrl)
+      ? rawUrl
+      : `https://${rawUrl}`;
+    hostname = new URL(withScheme).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+
+  const isPlainHttp = /^http:\/\//i.test(rawUrl);
+  const isPunycode = hostname.includes("xn--");
+
+  const normalized = normalizeHomoglyphs(hostname);
+  const hasManyHyphens = (hostname.match(/-/g) || []).length >= 2;
+
+  const looksLikeBrandLookalike = WATCHED_BRANDS.some((brand) => {
+    if (hostname.includes(brand)) return false; // exact brand substring, not a lookalike
+    return normalized.includes(brand) || (hasManyHyphens && normalized.includes(brand));
+  });
+
+  if (isPunycode) {
+    return "This domain uses international characters that can mimic a trusted site (punycode). Verify it carefully before entering credentials.";
+  }
+
+  if (looksLikeBrandLookalike) {
+    return "This domain resembles a well-known brand but isn't the official spelling. Double-check it's not a phishing site.";
+  }
+
+  if (isPlainHttp) {
+    return "This site uses unencrypted HTTP, not HTTPS. Avoid entering credentials on it if possible.";
+  }
+
+  return null;
+};
+
+/* ============================================================
    COMPONENT
 ============================================================ */
 
@@ -163,10 +235,24 @@ export default function Hero({ token }) {
   const togglePasswordVisibility = useCallback((id) => {
     if (!id) return;
 
-    setVisiblePasswords((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setVisiblePasswords((prev) => {
+      const willShow = !prev[id];
+
+      // Security: auto-hide the revealed password after 10s so it
+      // doesn't stay exposed on-screen (shoulder-surfing protection).
+      if (willShow) {
+        window.setTimeout(() => {
+          setVisiblePasswords((current) =>
+            current[id] ? { ...current, [id]: false } : current,
+          );
+        }, 10000);
+      }
+
+      return {
+        ...prev,
+        [id]: willShow,
+      };
+    });
   }, []);
 
   /* ==========================================================
@@ -237,13 +323,34 @@ export default function Hero({ token }) {
 
         setCopiedId(id);
 
-        toast.success("Password copied to clipboard.", {
+        toast.info("Password copied — clipboard clears in 20s.", {
           autoClose: 1500,
         });
 
         window.setTimeout(() => {
           setCopiedId((current) => (current === id ? null : current));
         }, 1500);
+
+        // Security: proactively clear the clipboard after a short delay
+        // so a copied password doesn't linger there indefinitely and get
+        // picked up by other apps/malware. Only clears it if the
+        // clipboard still holds exactly what we put there.
+        window.setTimeout(async () => {
+          try {
+            if (
+              navigator.clipboard &&
+              typeof navigator.clipboard.readText === "function"
+            ) {
+              const current = await navigator.clipboard.readText();
+              if (current === password) {
+                await copyText("");
+              }
+            }
+          } catch {
+            // Reading the clipboard may be blocked (permissions/focus) —
+            // fail silently, this is a best-effort security measure.
+          }
+        }, 20000);
       } catch (err) {
         console.error("COPY PASSWORD ERROR:", err);
         toast.error("Failed to copy password.");
@@ -719,6 +826,7 @@ export default function Hero({ token }) {
                 const id = realId || `fallback-${index}`;
 
                 const security = getSecurityStatus(item?.password);
+                const urlWarning = getUrlWarning(item?.url);
 
                 const isVisible = Boolean(visiblePasswords[id]);
 
@@ -762,6 +870,18 @@ export default function Hero({ token }) {
                         ) : (
                           <p className="text-[12px] text-[#727785]">No URL</p>
                         )}
+
+                        {urlWarning ? (
+                          <div
+                            className="mt-[4px] inline-flex items-center gap-[4px] text-[11px] font-medium text-[#b45309] bg-[#fef3c7] px-[6px] py-[2px] rounded-[6px]"
+                            title={urlWarning}
+                          >
+                            <span>⚠️</span>
+                            <span className="truncate max-w-[180px]">
+                              {urlWarning}
+                            </span>
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 

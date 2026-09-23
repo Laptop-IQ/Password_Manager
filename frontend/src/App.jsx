@@ -7,6 +7,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar";
 
 import Login from "./Context/Login";
@@ -23,6 +25,10 @@ const API_BASE = (
 ).replace(/\/+$/, "");
 
 const API_USER_URL = `${API_BASE}/api/user`;
+
+// Security: auto-lock the vault after this much inactivity so an
+// unattended, unlocked device doesn't expose saved passwords.
+const IDLE_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 
 const STORAGE_KEYS = {
   USER: "user",
@@ -245,6 +251,51 @@ export default function App() {
   }, []);
 
   // ------------------------------------------------
+  // Idle Auto-Lock
+  // Signs the user out after a period of inactivity to protect the
+  // vault on a shared or unattended device.
+  // ------------------------------------------------
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    let idleTimer = null;
+
+    const lockOut = () => {
+      clearStoredAuth();
+      setUser(null);
+      setToken(null);
+      toast.info("You were signed out after 10 minutes of inactivity.");
+    };
+
+    const resetTimer = () => {
+      if (idleTimer) window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(lockOut, IDLE_TIMEOUT_MS);
+    };
+
+    const activityEvents = [
+      "mousemove",
+      "mousedown",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ];
+
+    activityEvents.forEach((evt) =>
+      window.addEventListener(evt, resetTimer, { passive: true }),
+    );
+
+    resetTimer();
+
+    return () => {
+      if (idleTimer) window.clearTimeout(idleTimer);
+      activityEvents.forEach((evt) =>
+        window.removeEventListener(evt, resetTimer),
+      );
+    };
+  }, [token]);
+
+  // ------------------------------------------------
   // Bootstrap Authentication
   // ------------------------------------------------
 
@@ -384,6 +435,14 @@ export default function App() {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="light"
+      />
       <ScrollToTop />
       <Navbar user={user} onLogout={handleLogout} />
       <main className="pt-16">

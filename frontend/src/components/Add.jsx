@@ -28,9 +28,18 @@ export default function AddNewPassword({
   const isEditMode = Boolean(editPassword);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordCopied, setPasswordCopied] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState(EMPTY_FORM);
+
+  // Breach check (Have I Been Pwned, k-anonymity model): only the
+  // first 5 chars of the password's SHA-1 hash ever leave the browser,
+  // never the password itself.
+  const [breachStatus, setBreachStatus] = useState({
+    checking: false,
+    breachCount: null, // null = unknown/not checked, 0 = clean, >0 = seen in breaches
+  });
 
   // ============================================================
   // POPULATE EDIT DATA
@@ -297,6 +306,125 @@ export default function AddNewPassword({
   const strength = getPasswordStrength();
 
   // ============================================================
+  // BREACH CHECK (HaveIBeenPwned k-anonymity API)
+  // Debounced: checks ~600ms after the user stops typing a password.
+  // ============================================================
+
+  useEffect(() => {
+    const pwd = formData.password;
+
+    if (!pwd || pwd.length < 4) {
+      setBreachStatus({ checking: false, breachCount: null });
+      return undefined;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        setBreachStatus((prev) => ({ ...prev, checking: true }));
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(pwd);
+        const hashBuffer = await crypto.subtle.digest("SHA-1", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("")
+          .toUpperCase();
+
+        const prefix = hashHex.slice(0, 5);
+        const suffix = hashHex.slice(5);
+
+        const res = await fetch(
+          `https://api.pwnedpasswords.com/range/${prefix}`,
+        );
+
+        if (!res.ok) throw new Error("Breach check unavailable.");
+
+        const text = await res.text();
+        const match = text
+          .split("\n")
+          .map((line) => line.trim().split(":"))
+          .find(([hashSuffix]) => hashSuffix === suffix);
+
+        if (cancelled) return;
+
+        const count = match ? parseInt(match[1], 10) : 0;
+        setBreachStatus({ checking: false, breachCount: count });
+
+        if (count > 0) {
+          toast.warning(
+            `This password has appeared in ${count.toLocaleString()} known data breaches. Choose a different one.`,
+            { autoClose: 4000 },
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          // Fail silently/gracefully — never block saving just because
+          // the breach-check service is unreachable.
+          setBreachStatus({ checking: false, breachCount: null });
+        }
+      }
+    }, 600);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [formData.password]);
+
+  // ============================================================
+  // COPY PASSWORD
+  // ============================================================
+
+  const handleCopyPassword = async () => {
+    if (!formData.password) {
+      toast.warning("Nothing to copy yet.");
+      return;
+    }
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(formData.password);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = formData.password;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      setPasswordCopied(true);
+      toast.success("Password copied — clipboard clears in 20s.", {
+        autoClose: 1500,
+      });
+
+      window.setTimeout(() => setPasswordCopied(false), 1500);
+
+      // Security: clear the clipboard after a short delay if it still
+      // holds the copied password.
+      window.setTimeout(async () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.readText) {
+            const current = await navigator.clipboard.readText();
+            if (current === formData.password) {
+              await navigator.clipboard.writeText("");
+            }
+          }
+        } catch {
+          // Best-effort only — ignore if clipboard read is blocked.
+        }
+      }, 20000);
+    } catch {
+      toast.error("Failed to copy password.");
+    }
+  };
+
+  // ============================================================
   // RENDER
   // ============================================================
 
@@ -461,7 +589,7 @@ export default function AddNewPassword({
 
                 <div className="relative">
                   <input
-                    className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] pl-4 pr-12 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
+                    className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] pl-4 pr-20 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
                     placeholder="Enter a secure password"
                     type={showPassword ? "text" : "password"}
                     id="password"
@@ -474,48 +602,102 @@ export default function AddNewPassword({
                     }
                   />
 
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#727785] hover:text-[#191b23] cursor-pointer"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 3l18 18" />
-                        <path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c7 0 10 7 10 8s-3 8-10 8a10.5 10.5 0 0 1-3-.4" />
-                        <path d="M6.6 6.6C3.8 8.5 2 12 2 12s3 7 10 7" />
-                        <line x1="1" y1="1" x2="23" y2="23" />
-                      </svg>
-                    )}
-                  </button>
+                  <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-3">
+                    {/* Copy button */}
+
+                    <button
+                      type="button"
+                      onClick={handleCopyPassword}
+                      disabled={loading || !formData.password}
+                      className="p-1.5 flex items-center text-[#727785] hover:text-[#191b23] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer rounded-md hover:bg-[#ecedf7] transition-colors"
+                      aria-label="Copy password"
+                      title="Copy password"
+                    >
+                      {passwordCopied ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#059669"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect
+                            width="13"
+                            height="13"
+                            x="9"
+                            y="9"
+                            rx="2"
+                            ry="2"
+                          />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                      )}
+                    </button>
+
+                    {/* Show / hide button */}
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="p-1.5 flex items-center text-[#727785] hover:text-[#191b23] cursor-pointer rounded-md hover:bg-[#ecedf7] transition-colors"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M3 3l18 18" />
+                          <path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c7 0 10 7 10 8s-3 8-10 8a10.5 10.5 0 0 1-3-.4" />
+                          <path d="M6.6 6.6C3.8 8.5 2 12 2 12s3 7 10 7" />
+                          <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Strength */}
@@ -525,6 +707,24 @@ export default function AddNewPassword({
                     className={`h-full ${strength.bar} ${strength.width} rounded-full transition-all`}
                   />
                 </div>
+
+                {/* Breach check status */}
+
+                {breachStatus.checking ? (
+                  <p className="text-[11px] text-[#727785] flex items-center gap-1.5">
+                    <span className="w-3 h-3 border-2 border-[#727785]/30 border-t-[#727785] rounded-full animate-spin inline-block" />
+                    Checking against known data breaches...
+                  </p>
+                ) : breachStatus.breachCount > 0 ? (
+                  <p className="text-[11px] text-[#ba1a1a] font-medium flex items-center gap-1.5">
+                    ⚠️ Seen in {breachStatus.breachCount.toLocaleString()}{" "}
+                    known data breaches — pick a different password.
+                  </p>
+                ) : breachStatus.breachCount === 0 ? (
+                  <p className="text-[11px] text-[#059669] font-medium flex items-center gap-1.5">
+                    ✓ Not found in known breaches.
+                  </p>
+                ) : null}
               </div>
 
               {/* Notes */}
@@ -590,6 +790,15 @@ export default function AddNewPassword({
                 <p className="text-[11px] text-[#727785] leading-relaxed">
                   <strong>Pro tip:</strong> Use at least 16 characters with
                   uppercase, numbers, and symbols for maximum security.
+                </p>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-[#e1e2ec]">
+                <p className="text-[11px] text-[#727785] leading-relaxed">
+                  <strong>🛡️ Anti-scam reminder:</strong> Only enter
+                  credentials on the site's real, verified URL. No legitimate
+                  company will ever ask for your password by email, phone, or
+                  text.
                 </p>
               </div>
             </div>
