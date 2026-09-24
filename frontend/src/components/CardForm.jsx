@@ -157,13 +157,13 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[560px] bg-white rounded-[16px] shadow-2xl border border-[#e1e2ec] my-auto"
+        className="w-full max-w-[560px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 my-auto"
       >
-        <div className="p-6 border-b border-[#e1e2ec]">
-          <h3 className="text-[20px] font-bold text-[#191b23]">
+        <div className="p-6 border-b border-white/10">
+          <h3 className="text-[20px] font-bold text-[#F5F3FF]">
             {isEditMode ? "Edit Card" : "Add Debit / Credit Card"}
           </h3>
-          <p className="text-[13px] text-[#727785] mt-1">
+          <p className="text-[13px] text-[#A8A4BD] mt-1">
             Card number, CVV, and PIN are encrypted before being stored.
           </p>
         </div>
@@ -179,8 +179,8 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 disabled={loading}
                 className={`flex-1 py-2.5 rounded-[10px] text-[13px] font-semibold border transition-colors capitalize ${
                   formData.cardType === type
-                    ? "bg-[#0058be] border-[#0058be] text-white"
-                    : "bg-[#f9f9ff] border-[#e1e2ec] text-[#191b23] hover:bg-[#f2f3fd]"
+                    ? "bg-[#8B72FF] border-[#8B72FF] text-white"
+                    : "bg-black/20 border-white/10 text-[#F5F3FF] hover:bg-white/5"
                 }`}
               >
                 {type} card
@@ -190,7 +190,7 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5 col-span-2">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Cardholder name
               </label>
               <input
@@ -199,12 +199,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 onChange={handleChange}
                 disabled={loading}
                 placeholder="As printed on the card"
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5 col-span-2">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Bank / Issuer
               </label>
               <input
@@ -213,12 +213,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 onChange={handleChange}
                 disabled={loading}
                 placeholder="e.g. HDFC Bank"
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5 col-span-2">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Card number
               </label>
               <input
@@ -228,12 +228,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 disabled={loading}
                 inputMode="numeric"
                 placeholder="1234 5678 9012 3456"
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] tracking-wider focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] tracking-wider focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Expiry month
               </label>
               <input
@@ -244,12 +244,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 inputMode="numeric"
                 placeholder="MM"
                 maxLength={2}
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Expiry year
               </label>
               <input
@@ -260,12 +260,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 inputMode="numeric"
                 placeholder="YYYY"
                 maxLength={4}
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 CVV
               </label>
               <div className="relative">
@@ -278,12 +278,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                   inputMode="numeric"
                   maxLength={4}
                   placeholder="•••"
-                  className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 pr-10 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                  className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 pr-10 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowCvv((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#0058be] font-medium"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#C9BFFF] font-medium"
                 >
                   {showCvv ? "Hide" : "Show"}
                 </button>
@@ -291,7 +291,7 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 ATM / Card PIN (optional)
               </label>
               <div className="relative">
@@ -304,12 +304,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="••••"
-                  className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 pr-10 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                  className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 pr-10 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPin((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#0058be] font-medium"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#C9BFFF] font-medium"
                 >
                   {showPin ? "Hide" : "Show"}
                 </button>
@@ -317,7 +317,7 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
             </div>
 
             <div className="space-y-1.5 col-span-2">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Nickname (optional)
               </label>
               <input
@@ -326,12 +326,12 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 onChange={handleChange}
                 disabled={loading}
                 placeholder="e.g. Salary account debit card"
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
 
             <div className="space-y-1.5 col-span-2">
-              <label className="block text-[13px] font-semibold text-[#191b23]">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">
                 Notes (optional)
               </label>
               <textarea
@@ -340,25 +340,25 @@ export default function CardForm({ onClose, onSaved, token, editCard = null }) {
                 value={formData.notes}
                 onChange={handleChange}
                 disabled={loading}
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-[#f9f9ff] border-t border-[#e1e2ec] p-5 flex justify-end gap-3 rounded-b-[16px]">
+        <div className="bg-black/20 border-t border-white/10 p-5 flex justify-end gap-3 rounded-b-[20px]">
           <button
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-medium text-[#191b23] hover:bg-[#f2f3fd] rounded-[10px] disabled:opacity-50"
+            className="px-5 py-2.5 text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[10px] disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-[#0058be] hover:bg-[#004395] disabled:bg-[#b0b8cc] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
+            className="px-6 py-2.5 bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
           >
             {loading && (
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -280,8 +280,8 @@ export default function AddNewPassword({
     if (score >= 6) {
       return {
         text: "Strong",
-        color: "text-[#059669]",
-        bar: "bg-[#059669]",
+        color: "text-[#34D399]",
+        bar: "bg-[#34D399]",
         width: "w-full",
       };
     }
@@ -289,16 +289,16 @@ export default function AddNewPassword({
     if (score >= 4) {
       return {
         text: "Good",
-        color: "text-[#f59e0b]",
-        bar: "bg-[#f59e0b]",
+        color: "text-[#FBBF24]",
+        bar: "bg-[#FBBF24]",
         width: "w-3/4",
       };
     }
 
     return {
       text: "Weak",
-      color: "text-[#ba1a1a]",
-      bar: "bg-[#ba1a1a]",
+      color: "text-[#F87171]",
+      bar: "bg-[#F87171]",
       width: "w-1/3",
     };
   };
@@ -429,19 +429,19 @@ export default function AddNewPassword({
   // ============================================================
 
   return (
-    <div className="fixed inset-0 min-h-screen backdrop-blur-sm bg-[#9ca3af]/50 flex items-center justify-center p-4 font-sans z-50">
-      <div className="bg-white w-full max-w-[850px] rounded-[20px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 min-h-screen backdrop-blur-sm bg-[#000000]/50 flex items-center justify-center p-4 font-sans z-50">
+      <div className="bg-[#120F1B] w-full max-w-[850px] rounded-[20px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* ======================================================
             HEADER
         ====================================================== */}
 
-        <div className="p-8 pb-6 flex justify-between items-start border-b border-[#e1e2ec] bg-white z-10">
+        <div className="p-8 pb-6 flex justify-between items-start border-b border-white/10 bg-[#120F1B] z-10">
           <div>
-            <h1 className="text-[22px] font-semibold text-[#191b23] leading-tight">
+            <h1 className="text-[22px] font-semibold text-[#F5F3FF] leading-tight">
               {isEditMode ? "Edit Password" : "Add New Password"}
             </h1>
 
-            <p className="text-[14px] text-[#727785] mt-1">
+            <p className="text-[14px] text-[#A8A4BD] mt-1">
               {isEditMode
                 ? "Update your saved credential details"
                 : "Securely store a new credential"}
@@ -450,7 +450,7 @@ export default function AddNewPassword({
 
           <button
             type="button"
-            className="text-[#727785] hover:text-[#191b23] transition-colors cursor-pointer p-2 hover:bg-[#f2f3fd] rounded-lg"
+            className="text-[#A8A4BD] hover:text-[#F5F3FF] transition-colors cursor-pointer p-2 hover:bg-white/5 rounded-lg"
             onClick={handleCancel}
             disabled={loading}
             aria-label="Close"
@@ -485,14 +485,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#191b23]"
+                  className="block text-[13px] font-semibold text-[#F5F3FF]"
                   htmlFor="websiteName"
                 >
                   Website Name
                 </label>
 
                 <input
-                  className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
+                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
                   placeholder="e.g. GitHub, Gmail, Netflix"
                   type="text"
                   id="websiteName"
@@ -508,14 +508,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#191b23]"
+                  className="block text-[13px] font-semibold text-[#F5F3FF]"
                   htmlFor="url"
                 >
                   Website URL
                 </label>
 
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#727785]">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#A8A4BD]">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -533,7 +533,7 @@ export default function AddNewPassword({
                   </div>
 
                   <input
-                    className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] pl-10 pr-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
+                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] pl-10 pr-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
                     placeholder="https://github.com"
                     type="url"
                     id="url"
@@ -550,14 +550,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#191b23]"
+                  className="block text-[13px] font-semibold text-[#F5F3FF]"
                   htmlFor="username"
                 >
                   Username or Email
                 </label>
 
                 <input
-                  className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
+                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
                   placeholder="developer@example.com"
                   type="text"
                   id="username"
@@ -574,7 +574,7 @@ export default function AddNewPassword({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label
-                    className="block text-[13px] font-semibold text-[#191b23]"
+                    className="block text-[13px] font-semibold text-[#F5F3FF]"
                     htmlFor="password"
                   >
                     Password
@@ -589,7 +589,7 @@ export default function AddNewPassword({
 
                 <div className="relative">
                   <input
-                    className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] pl-4 pr-20 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785]"
+                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] pl-4 pr-20 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
                     placeholder="Enter a secure password"
                     type={showPassword ? "text" : "password"}
                     id="password"
@@ -609,7 +609,7 @@ export default function AddNewPassword({
                       type="button"
                       onClick={handleCopyPassword}
                       disabled={loading || !formData.password}
-                      className="p-1.5 flex items-center text-[#727785] hover:text-[#191b23] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer rounded-md hover:bg-[#ecedf7] transition-colors"
+                      className="p-1.5 flex items-center text-[#A8A4BD] hover:text-[#F5F3FF] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer rounded-md hover:bg-[#15121F] transition-colors"
                       aria-label="Copy password"
                       title="Copy password"
                     >
@@ -620,7 +620,7 @@ export default function AddNewPassword({
                           height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="#059669"
+                          stroke="#34D399"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -657,7 +657,7 @@ export default function AddNewPassword({
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="p-1.5 flex items-center text-[#727785] hover:text-[#191b23] cursor-pointer rounded-md hover:bg-[#ecedf7] transition-colors"
+                      className="p-1.5 flex items-center text-[#A8A4BD] hover:text-[#F5F3FF] cursor-pointer rounded-md hover:bg-[#15121F] transition-colors"
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
@@ -702,7 +702,7 @@ export default function AddNewPassword({
 
                 {/* Strength */}
 
-                <div className="h-1.5 bg-[#ecedf7] rounded-full overflow-hidden">
+                <div className="h-1.5 bg-[#15121F] rounded-full overflow-hidden">
                   <div
                     className={`h-full ${strength.bar} ${strength.width} rounded-full transition-all`}
                   />
@@ -711,17 +711,17 @@ export default function AddNewPassword({
                 {/* Breach check status */}
 
                 {breachStatus.checking ? (
-                  <p className="text-[11px] text-[#727785] flex items-center gap-1.5">
-                    <span className="w-3 h-3 border-2 border-[#727785]/30 border-t-[#727785] rounded-full animate-spin inline-block" />
+                  <p className="text-[11px] text-[#A8A4BD] flex items-center gap-1.5">
+                    <span className="w-3 h-3 border-2 border-[#A8A4BD]/30 border-t-[#A8A4BD] rounded-full animate-spin inline-block" />
                     Checking against known data breaches...
                   </p>
                 ) : breachStatus.breachCount > 0 ? (
-                  <p className="text-[11px] text-[#ba1a1a] font-medium flex items-center gap-1.5">
+                  <p className="text-[11px] text-[#F87171] font-medium flex items-center gap-1.5">
                     ⚠️ Seen in {breachStatus.breachCount.toLocaleString()}{" "}
                     known data breaches — pick a different password.
                   </p>
                 ) : breachStatus.breachCount === 0 ? (
-                  <p className="text-[11px] text-[#059669] font-medium flex items-center gap-1.5">
+                  <p className="text-[11px] text-[#34D399] font-medium flex items-center gap-1.5">
                     ✓ Not found in known breaches.
                   </p>
                 ) : null}
@@ -731,14 +731,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2 pb-4">
                 <label
-                  className="block text-[13px] font-semibold text-[#191b23]"
+                  className="block text-[13px] font-semibold text-[#F5F3FF]"
                   htmlFor="notes"
                 >
                   Notes (optional)
                 </label>
 
                 <textarea
-                  className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all placeholder:text-[#727785] resize-none"
+                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD] resize-none"
                   placeholder="Add security questions or recovery codes..."
                   id="notes"
                   name="notes"
@@ -754,11 +754,11 @@ export default function AddNewPassword({
                 GENERATOR
             ================================================== */}
 
-            <div className="w-full md:w-[300px] bg-[#f9f9ff] border border-[#e1e2ec] rounded-[16px] p-6 flex flex-col h-fit">
+            <div className="w-full md:w-[300px] bg-[#1A1625] border border-white/10 rounded-[16px] p-6 flex flex-col h-fit">
               <div className="flex items-center gap-2 mb-6">
                 <span className="text-[20px]">✨</span>
 
-                <h3 className="text-[14px] font-semibold text-[#191b23]">
+                <h3 className="text-[14px] font-semibold text-[#F5F3FF]">
                   Generator
                 </h3>
               </div>
@@ -767,7 +767,7 @@ export default function AddNewPassword({
                 type="button"
                 onClick={generatePassword}
                 disabled={loading}
-                className="w-full px-6 py-3 cursor-pointer flex items-center gap-2 justify-center bg-[#0058be] hover:bg-[#004395] disabled:bg-[#b0b8cc] text-white text-[14px] font-semibold rounded-[12px] shadow-sm transition-all"
+                className="w-full px-6 py-3 cursor-pointer flex items-center gap-2 justify-center bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-semibold rounded-[12px] shadow-sm transition-all"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -786,15 +786,15 @@ export default function AddNewPassword({
                 Generate
               </button>
 
-              <div className="mt-6 pt-6 border-t border-[#e1e2ec]">
-                <p className="text-[11px] text-[#727785] leading-relaxed">
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="text-[11px] text-[#A8A4BD] leading-relaxed">
                   <strong>Pro tip:</strong> Use at least 16 characters with
                   uppercase, numbers, and symbols for maximum security.
                 </p>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-[#e1e2ec]">
-                <p className="text-[11px] text-[#727785] leading-relaxed">
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="text-[11px] text-[#A8A4BD] leading-relaxed">
                   <strong>🛡️ Anti-scam reminder:</strong> Only enter
                   credentials on the site's real, verified URL. No legitimate
                   company will ever ask for your password by email, phone, or
@@ -808,12 +808,12 @@ export default function AddNewPassword({
               FOOTER
           ==================================================== */}
 
-          <div className="bg-[#f9f9ff] border-t border-[#e1e2ec] p-6 flex justify-end items-center gap-4">
+          <div className="bg-[#1A1625] border-t border-white/10 p-6 flex justify-end items-center gap-4">
             <button
               type="button"
               onClick={handleCancel}
               disabled={loading}
-              className="px-5 py-2.5 cursor-pointer text-[14px] font-medium text-[#191b23] hover:bg-[#f2f3fd] rounded-[12px] transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 cursor-pointer text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[12px] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -821,7 +821,7 @@ export default function AddNewPassword({
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 cursor-pointer bg-[#0058be] hover:bg-[#004395] disabled:bg-[#b0b8cc] text-white text-[14px] font-medium rounded-[12px] flex items-center gap-2 shadow-sm transition-all"
+              className="px-6 py-2.5 cursor-pointer bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[12px] flex items-center gap-2 shadow-sm transition-all"
             >
               {loading ? (
                 <>

@@ -570,9 +570,9 @@ export default function Hero({ token }) {
     if (password.length >= 16) {
       return {
         status: "Secure",
-        color: "text-[#059669]",
-        bg: "bg-[#d1fae5]",
-        bar: "bg-[#059669]",
+        color: "text-[#34D399]",
+        bg: "bg-[#0B2E21]",
+        bar: "bg-[#34D399]",
         width: "w-[85%]",
       };
     }
@@ -580,18 +580,18 @@ export default function Hero({ token }) {
     if (password.length >= 12) {
       return {
         status: "Fair",
-        color: "text-[#b45309]",
-        bg: "bg-[#fef3c7]",
-        bar: "bg-[#f59e0b]",
+        color: "text-[#FBBF24]",
+        bg: "bg-[#3A2A08]",
+        bar: "bg-[#FBBF24]",
         width: "w-[60%]",
       };
     }
 
     return {
       status: "Weak",
-      color: "text-[#ba1a1a]",
-      bg: "bg-[#ffdad6]",
-      bar: "bg-[#ba1a1a]",
+      color: "text-[#F87171]",
+      bg: "bg-[#3F1013]",
+      bar: "bg-[#F87171]",
       width: "w-[20%]",
     };
   }, []);
@@ -612,7 +612,7 @@ export default function Hero({ token }) {
   ========================================================== */
 
   return (
-    <div className="min-h-screen bg-[#f9f9ff] font-['Inter',sans-serif] text-[#191b23]">
+    <div className="min-h-screen bg-[#0A0810] font-['Inter',sans-serif] text-[#F5F3FF]">
       {/* ======================================================
           ADD / EDIT MODAL
       ====================================================== */}
@@ -642,15 +642,15 @@ export default function Hero({ token }) {
             }
           }}
         >
-          <div className="w-full max-w-[420px] bg-white rounded-[16px] shadow-2xl border border-[#e1e2ec] p-[24px]">
-            <div className="w-[48px] h-[48px] rounded-full bg-[#ffdad6] flex items-center justify-center mb-[16px]">
+          <div className="w-full max-w-[420px] bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] shadow-2xl border border-white/10 p-[24px]">
+            <div className="w-[48px] h-[48px] rounded-full bg-[#3F1013] flex items-center justify-center mb-[16px]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="22"
                 height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#ba1a1a"
+                stroke="#F87171"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -664,18 +664,18 @@ export default function Hero({ token }) {
 
             <h3
               id="delete-dialog-title"
-              className="text-[20px] font-bold text-[#191b23]"
+              className="text-[20px] font-bold text-[#F5F3FF]"
             >
               Delete password?
             </h3>
 
-            <p className="text-[14px] text-[#727785] mt-[8px] leading-6">
+            <p className="text-[14px] text-[#A8A4BD] mt-[8px] leading-6">
               {deleteTarget?.websiteName
                 ? `Are you sure you want to permanently delete the password for ${deleteTarget.websiteName}?`
                 : "Are you sure you want to permanently delete this password?"}
             </p>
 
-            <p className="text-[13px] text-[#ba1a1a] mt-[12px]">
+            <p className="text-[13px] text-[#F87171] mt-[12px]">
               This action cannot be undone.
             </p>
 
@@ -684,7 +684,7 @@ export default function Hero({ token }) {
                 type="button"
                 onClick={cancelDelete}
                 disabled={isDeletingTarget}
-                className="px-[16px] py-[10px] rounded-[8px] bg-[#f2f3fd] hover:bg-[#e1e2ec] text-[#191b23] text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-[16px] py-[10px] rounded-[8px] bg-white/5 hover:bg-white/10 text-[#F5F3FF] text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -693,7 +693,7 @@ export default function Hero({ token }) {
                 type="button"
                 onClick={() => handleDelete(deleteTargetId)}
                 disabled={!deleteTargetId || isDeletingTarget}
-                className="min-w-[90px] px-[16px] py-[10px] rounded-[8px] bg-[#ba1a1a] hover:bg-[#93000a] text-white text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-[8px]"
+                className="min-w-[90px] px-[16px] py-[10px] rounded-[8px] bg-[#F87171] hover:bg-[#B91C1C] text-white text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-[8px]"
               >
                 {isDeletingTarget ? (
                   <>
@@ -722,11 +722,11 @@ export default function Hero({ token }) {
         ==================================================== */}
 
         <div className="mb-[32px]">
-          <h2 className="text-[32px] font-bold font-['Manrope',sans-serif] text-[#191b23]">
+          <h2 className="text-[32px] font-bold font-['Manrope',sans-serif] text-[#F5F3FF]">
             Password Vault
           </h2>
 
-          <p className="text-[16px] text-[#424754] mt-[8px]">
+          <p className="text-[16px] text-[#D4D1E3] mt-[8px]">
             {passwords.length} password
             {passwords.length !== 1 ? "s" : ""} stored securely
           </p>
@@ -737,20 +737,20 @@ export default function Hero({ token }) {
         ==================================================== */}
 
         {error && (
-          <div className="bg-[#ffdad6] border border-[#ba1a1a] rounded-[12px] p-[16px] mb-[24px] flex items-start justify-between gap-4">
+          <div className="bg-[#3F1013] border border-[#F87171] rounded-[12px] p-[16px] mb-[24px] flex items-start justify-between gap-4">
             <div>
-              <p className="text-[14px] font-semibold text-[#ba1a1a]">
+              <p className="text-[14px] font-semibold text-[#F87171]">
                 Error loading passwords
               </p>
 
-              <p className="text-[13px] text-[#ba1a1a]/80 mt-[4px]">{error}</p>
+              <p className="text-[13px] text-[#F87171]/80 mt-[4px]">{error}</p>
             </div>
 
             <button
               type="button"
               onClick={fetchPasswords}
               disabled={loading}
-              className="text-[12px] font-semibold text-[#ba1a1a] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer whitespace-nowrap"
+              className="text-[12px] font-semibold text-[#F87171] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer whitespace-nowrap"
             >
               {loading ? "Loading..." : "Retry"}
             </button>
@@ -762,11 +762,11 @@ export default function Hero({ token }) {
         ==================================================== */}
 
         {loading ? (
-          <div className="bg-white rounded-[16px] border border-[#e1e2ec] p-[48px] text-center">
+          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[48px] text-center">
             <div className="inline-block">
-              <div className="w-[40px] h-[40px] border-4 border-[#e1e2ec] border-t-[#0058be] rounded-full animate-spin mb-[16px]" />
+              <div className="w-[40px] h-[40px] border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mb-[16px]" />
 
-              <p className="text-[16px] text-[#727785] font-medium">
+              <p className="text-[16px] text-[#A8A4BD] font-medium">
                 Loading your vault...
               </p>
             </div>
@@ -776,23 +776,23 @@ export default function Hero({ token }) {
              EMPTY STATE
           ================================================== */
 
-          <div className="bg-white rounded-[16px] border border-[#e1e2ec] p-[64px] text-center">
-            <div className="w-[56px] h-[56px] bg-[#e0e7ff] rounded-full flex items-center justify-center mx-auto mb-[24px] text-[24px]">
+          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[64px] text-center">
+            <div className="w-[56px] h-[56px] bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-[24px] text-[24px]">
               🔐
             </div>
 
-            <h3 className="text-[20px] font-semibold text-[#191b23] mb-[8px]">
+            <h3 className="text-[20px] font-semibold text-[#F5F3FF] mb-[8px]">
               No passwords yet
             </h3>
 
-            <p className="text-[16px] text-[#727785] mb-[24px]">
+            <p className="text-[16px] text-[#A8A4BD] mb-[24px]">
               Start by adding your first password to get started
             </p>
 
             <button
               type="button"
               onClick={handleOpenModal}
-              className="bg-[#0058be] hover:bg-[#004395] text-white px-[24px] py-[12px] rounded-[8px] text-[14px] font-semibold cursor-pointer transition-colors"
+              className="bg-[#8B72FF] hover:bg-[#765be8] text-white px-[24px] py-[12px] rounded-[8px] text-[14px] font-semibold cursor-pointer transition-colors"
             >
               + Add your first password
             </button>
@@ -802,10 +802,10 @@ export default function Hero({ token }) {
              PASSWORD TABLE
           ================================================== */
 
-          <div className="bg-white rounded-[16px] border border-[#e1e2ec] shadow-[0_4px_20px_rgba(15,23,42,0.03)] overflow-hidden">
+          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 shadow-[0_4px_20px_rgba(139,114,255,0.08)] overflow-hidden">
             {/* TABLE HEADER */}
 
-            <div className="hidden md:grid grid-cols-12 gap-[16px] px-[24px] py-[16px] border-b border-[#e1e2ec] bg-[#f9f9ff]/50 text-[12px] font-semibold text-[#727785] uppercase tracking-[0.02em]">
+            <div className="hidden md:grid grid-cols-12 gap-[16px] px-[24px] py-[16px] border-b border-white/10 bg-[#0A0810]/50 text-[12px] font-semibold text-[#A8A4BD] uppercase tracking-[0.02em]">
               <div className="col-span-3">Website</div>
 
               <div className="col-span-2">Username</div>
@@ -819,7 +819,7 @@ export default function Hero({ token }) {
 
             {/* ITEMS */}
 
-            <div className="flex flex-col divide-y divide-[#e1e2ec]">
+            <div className="flex flex-col divide-y divide-white/10">
               {passwords.map((item, index) => {
                 const realId = getPasswordId(item);
 
@@ -835,7 +835,7 @@ export default function Hero({ token }) {
                 return (
                   <div
                     key={id}
-                    className={`grid grid-cols-1 md:grid-cols-12 gap-[16px] items-center px-[20px] md:px-[24px] py-[20px] hover:bg-[#f2f3fd]/50 transition-colors ${
+                    className={`grid grid-cols-1 md:grid-cols-12 gap-[16px] items-center px-[20px] md:px-[24px] py-[20px] hover:bg-white/[0.04] transition-colors ${
                       isDeleting ? "opacity-60" : ""
                     }`}
                   >
@@ -844,12 +844,12 @@ export default function Hero({ token }) {
                     ================================================== */}
 
                     <div className="md:col-span-3 flex items-center gap-[12px] min-w-0">
-                      <div className="w-[40px] h-[40px] rounded-[8px] bg-[#e0e7ff] flex items-center justify-center flex-shrink-0">
+                      <div className="w-[40px] h-[40px] rounded-[8px] bg-[#8B72FF]/15 flex items-center justify-center flex-shrink-0">
                         🔗
                       </div>
 
                       <div className="min-w-0">
-                        <h3 className="text-[14px] font-semibold text-[#191b23] truncate">
+                        <h3 className="text-[14px] font-semibold text-[#F5F3FF] truncate">
                           {item?.websiteName || "Unnamed Website"}
                         </h3>
 
@@ -862,18 +862,18 @@ export default function Hero({ token }) {
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[12px] text-[#0058be] hover:text-[#004395] hover:underline truncate block"
+                            className="text-[12px] text-[#8B72FF] hover:text-[#765be8] hover:underline truncate block"
                             title={item.url}
                           >
                             {item.url}
                           </a>
                         ) : (
-                          <p className="text-[12px] text-[#727785]">No URL</p>
+                          <p className="text-[12px] text-[#A8A4BD]">No URL</p>
                         )}
 
                         {urlWarning ? (
                           <div
-                            className="mt-[4px] inline-flex items-center gap-[4px] text-[11px] font-medium text-[#b45309] bg-[#fef3c7] px-[6px] py-[2px] rounded-[6px]"
+                            className="mt-[4px] inline-flex items-center gap-[4px] text-[11px] font-medium text-[#FBBF24] bg-[#3A2A08] px-[6px] py-[2px] rounded-[6px]"
                             title={urlWarning}
                           >
                             <span>⚠️</span>
@@ -892,7 +892,7 @@ export default function Hero({ token }) {
                     <div className="md:col-span-2 min-w-0">
                       <div className="flex items-center gap-[6px]">
                         <span
-                          className="text-[14px] text-[#424754] truncate flex-1"
+                          className="text-[14px] text-[#D4D1E3] truncate flex-1"
                           title={item?.username || ""}
                         >
                           {item?.username || "—"}
@@ -905,8 +905,8 @@ export default function Hero({ token }) {
                             disabled={isDeleting}
                             className={`p-[6px] rounded-[6px] flex-shrink-0 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                               copiedUsernameId === id
-                                ? "text-[#059669] bg-[#d1fae5]"
-                                : "text-[#0058be] hover:bg-[#e0e7ff]"
+                                ? "text-[#34D399] bg-[#0B2E21]"
+                                : "text-[#8B72FF] hover:bg-[#8B72FF]/15"
                             }`}
                             title={
                               copiedUsernameId === id
@@ -965,7 +965,7 @@ export default function Hero({ token }) {
 
                     <div className="md:col-span-3 min-w-0">
                       <div className="flex items-center gap-[6px]">
-                        <div className="flex-1 min-w-0 bg-[#f2f3fd] border border-[#e1e2ec] rounded-[8px] px-[10px] py-[8px]">
+                        <div className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-[8px] px-[10px] py-[8px]">
                           <span className="text-[13px] font-mono truncate block">
                             {!item?.password
                               ? "Unavailable"
@@ -981,7 +981,7 @@ export default function Hero({ token }) {
                           type="button"
                           onClick={() => togglePasswordVisibility(id)}
                           disabled={!item?.password || isDeleting}
-                          className="p-[8px] rounded-[6px] text-[#0058be] hover:bg-[#e0e7ff] cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="p-[8px] rounded-[6px] text-[#8B72FF] hover:bg-[#8B72FF]/15 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           title={isVisible ? "Hide password" : "Show password"}
                           aria-label={
                             isVisible ? "Hide password" : "Show password"
@@ -1032,8 +1032,8 @@ export default function Hero({ token }) {
                           disabled={!item?.password || isDeleting}
                           className={`p-[8px] rounded-[6px] cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                             copiedId === id
-                              ? "text-[#059669] bg-[#d1fae5]"
-                              : "text-[#0058be] hover:bg-[#e0e7ff]"
+                              ? "text-[#34D399] bg-[#0B2E21]"
+                              : "text-[#8B72FF] hover:bg-[#8B72FF]/15"
                           }`}
                           title="Copy password"
                           aria-label="Copy password"
@@ -1080,7 +1080,7 @@ export default function Hero({ token }) {
                     ================================================== */}
 
                     <div className="md:col-span-2 flex items-center gap-[8px]">
-                      <div className="flex-1 h-[6px] bg-[#ecedf7] rounded-full overflow-hidden">
+                      <div className="flex-1 h-[6px] bg-[#15121F] rounded-full overflow-hidden">
                         <div
                           className={`h-full ${security.bar} ${security.width} rounded-full`}
                         />
@@ -1104,7 +1104,7 @@ export default function Hero({ token }) {
                         type="button"
                         onClick={() => handleEdit(item)}
                         disabled={isDeleting || !realId}
-                        className="text-[#0058be] hover:text-[#004395] hover:bg-[#e0e7ff] disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
+                        className="text-[#8B72FF] hover:text-[#765be8] hover:bg-[#8B72FF]/15 disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
                         aria-label="Edit password"
                         title="Edit"
                       >
@@ -1131,13 +1131,13 @@ export default function Hero({ token }) {
                         type="button"
                         onClick={() => confirmDelete(item)}
                         disabled={isDeleting || !realId}
-                        className="text-[#ba1a1a] hover:text-[#93000a] hover:bg-[#ffdad6] disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
+                        className="text-[#F87171] hover:text-[#B91C1C] hover:bg-[#3F1013] disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
                         aria-label="Delete password"
                         title={isDeleting ? "Deleting..." : "Delete"}
                       >
                         {isDeleting ? (
                           <span
-                            className="block w-[17px] h-[17px] border-2 border-[#ba1a1a]/30 border-t-[#ba1a1a] rounded-full animate-spin"
+                            className="block w-[17px] h-[17px] border-2 border-[#F87171]/30 border-t-[#F87171] rounded-full animate-spin"
                             aria-hidden="true"
                           />
                         ) : (
@@ -1196,9 +1196,9 @@ export default function Hero({ token }) {
             rounded-full
             md:rounded-[16px]
 
-            bg-[#0058be]
-            hover:bg-[#004395]
-            active:bg-[#003b82]
+            bg-[#8B72FF]
+            hover:bg-[#765be8]
+            active:bg-[#5c46c4]
 
             text-white
 
@@ -1207,8 +1207,8 @@ export default function Hero({ token }) {
             justify-center
             gap-[8px]
 
-            shadow-[0_8px_24px_rgba(0,88,190,0.35)]
-            hover:shadow-[0_10px_28px_rgba(0,88,190,0.45)]
+            shadow-[0_8px_24px_rgba(139,114,255,0.35)]
+            hover:shadow-[0_10px_28px_rgba(139,114,255,0.45)]
 
             transition-all
             duration-200
@@ -1219,7 +1219,7 @@ export default function Hero({ token }) {
 
             focus:outline-none
             focus-visible:ring-4
-            focus-visible:ring-[#0058be]/30
+            focus-visible:ring-[#8B72FF]/30
 
             cursor-pointer
             select-none

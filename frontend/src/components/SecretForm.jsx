@@ -126,20 +126,20 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[480px] bg-white rounded-[16px] shadow-2xl border border-[#e1e2ec] my-auto"
+        className="w-full max-w-[480px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 my-auto"
       >
-        <div className="p-6 border-b border-[#e1e2ec]">
-          <h3 className="text-[20px] font-bold text-[#191b23]">
+        <div className="p-6 border-b border-white/10">
+          <h3 className="text-[20px] font-bold text-[#F5F3FF]">
             {isEditMode ? "Edit Secret" : "Add Secret / TPIN"}
           </h3>
-          <p className="text-[13px] text-[#727785] mt-1">
+          <p className="text-[13px] text-[#A8A4BD] mt-1">
             Use this for TPINs, UPI PINs, security answers, or any other sensitive code.
           </p>
         </div>
 
         <div className="p-6 space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#191b23]">
+            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
               Type
             </label>
             <select
@@ -147,7 +147,7 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               value={formData.secretType}
               onChange={handleChange}
               disabled={loading}
-              className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
             >
               {SECRET_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -158,7 +158,7 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#191b23]">
+            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
               Title
             </label>
             <input
@@ -167,12 +167,12 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. Zerodha TPIN"
-              className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#191b23]">
+            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
               Issuer / Provider (optional)
             </label>
             <input
@@ -181,12 +181,12 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. Zerodha, ICICI Bank"
-              className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#191b23]">
+            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
               Value
             </label>
             <div className="relative">
@@ -197,12 +197,12 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
                 onChange={handleChange}
                 disabled={loading}
                 placeholder={isEditMode ? "Leave unchanged to keep current value" : "Enter the PIN / code"}
-                className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 pr-14 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 pr-14 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
               />
               <button
                 type="button"
                 onClick={() => setShowValue((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#0058be] font-medium"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#C9BFFF] font-medium"
               >
                 {showValue ? "Hide" : "Show"}
               </button>
@@ -210,7 +210,7 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#191b23]">
+            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
               Notes (optional)
             </label>
             <textarea
@@ -219,24 +219,24 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               value={formData.notes}
               onChange={handleChange}
               disabled={loading}
-              className="w-full bg-[#f9f9ff] border border-[#e1e2ec] text-[#191b23] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be]"
+              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
             />
           </div>
         </div>
 
-        <div className="bg-[#f9f9ff] border-t border-[#e1e2ec] p-5 flex justify-end gap-3 rounded-b-[16px]">
+        <div className="bg-black/20 border-t border-white/10 p-5 flex justify-end gap-3 rounded-b-[20px]">
           <button
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-medium text-[#191b23] hover:bg-[#f2f3fd] rounded-[10px] disabled:opacity-50"
+            className="px-5 py-2.5 text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[10px] disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-[#0058be] hover:bg-[#004395] disabled:bg-[#b0b8cc] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
+            className="px-6 py-2.5 bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
           >
             {loading && (
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
