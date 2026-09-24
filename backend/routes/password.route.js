@@ -1,4 +1,5 @@
 import express from "express";
+import authMiddleware from "../middleware/auth.js";
 import {
   createPassword,
   getAllPasswords,
@@ -9,19 +10,22 @@ import {
 
 const router = express.Router();
 
+// Every password route requires a valid, logged-in user.
+router.use(authMiddleware);
+
 // Create a new password
 router.post("/", createPassword);
 
-// Get all passwords
+// Get all passwords belonging to the logged-in user
 router.get("/", getAllPasswords);
 
-// Get single password by ID
+// Get single password by ID (only if it belongs to the logged-in user)
 router.get("/:id", getPasswordById);
 
-// Update password
+// Update password (only if it belongs to the logged-in user)
 router.put("/:id", updatePassword);
 
-// Delete password
+// Delete password (only if it belongs to the logged-in user)
 router.delete("/:id", deletePassword);
 
 export default router;

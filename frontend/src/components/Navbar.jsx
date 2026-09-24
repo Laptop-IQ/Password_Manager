@@ -24,6 +24,13 @@ export default function Navbar({ user, onLogout }) {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              <Link
+                to="/vault"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
+              >
+                Cards &amp; Secrets
+              </Link>
+
               <span className="hidden text-sm text-slate-300 sm:block">
                 {user.name || user.email}
               </span>

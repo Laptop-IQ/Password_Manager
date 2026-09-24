@@ -16,6 +16,7 @@ import Signup from "./Context/Signup";
 import VerifyOtp from "./Context/VerifyOtp";
 import ForgotPassword from "./Context/ForgotPassword";
 import Hero from "./components/Hero";
+import Vault from "./components/Vault";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -177,6 +178,14 @@ function LoadingScreen() {
 function PublicOnlyRoute({ user, token, children }) {
   if (user && token) {
     return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+function ProtectedRoute({ user, token, children }) {
+  if (!user || !token) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -455,6 +464,16 @@ export default function App() {
             }
           />
          
+          {/* Card & Secrets Vault */}
+          <Route
+            path="/vault"
+            element={
+              <ProtectedRoute user={user} token={token}>
+                <Vault token={token} />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Login */}
           <Route
             path="/login"

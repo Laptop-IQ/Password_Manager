@@ -8,6 +8,8 @@ import hpp from "hpp";
 
 import userRouter from "./routes/userRoute.js";
 import passwordRouter from "./routes/password.route.js";
+import cardRouter from "./routes/card.route.js";
+import secretRouter from "./routes/secret.route.js";
 import connectDB from "./config/db.js";
 
 // ============================================================================
@@ -178,8 +180,10 @@ app.use("/api/user/forgot-password", authLimiter);
 app.use("/api/user/reset-password", authLimiter);
 app.use("/api/user/verify-forgot-otp", authLimiter);
 
-// Apply password limiter to password endpoints
+// Apply password limiter to password/card/secret endpoints
 app.use("/api/passwords", passwordLimiter);
+app.use("/api/cards", passwordLimiter);
+app.use("/api/secrets", passwordLimiter);
 
 // ============================================================================
 // BODY PARSING MIDDLEWARE
@@ -267,6 +271,12 @@ app.use("/api/user", userRouter);
 // Password management routes
 app.use("/api/passwords", passwordRouter);
 
+// Card vault routes (debit / credit cards)
+app.use("/api/cards", cardRouter);
+
+// Secrets vault routes (TPIN, UPI PIN, and other sensitive codes)
+app.use("/api/secrets", secretRouter);
+
 // ============================================================================
 // ROOT & DOCUMENTATION
 // ============================================================================
@@ -281,6 +291,8 @@ app.get("/", (req, res) => {
       healthDb: "/health/db",
       users: "/api/user",
       passwords: "/api/passwords",
+      cards: "/api/cards",
+      secrets: "/api/secrets",
     },
     documentation: {
       passwords: {
@@ -289,6 +301,20 @@ app.get("/", (req, res) => {
         getOne: "GET /api/passwords/:id",
         update: "PUT /api/passwords/:id",
         delete: "DELETE /api/passwords/:id",
+      },
+      cards: {
+        create: "POST /api/cards",
+        getAll: "GET /api/cards",
+        getOne: "GET /api/cards/:id",
+        update: "PUT /api/cards/:id",
+        delete: "DELETE /api/cards/:id",
+      },
+      secrets: {
+        create: "POST /api/secrets",
+        getAll: "GET /api/secrets",
+        getOne: "GET /api/secrets/:id",
+        update: "PUT /api/secrets/:id",
+        delete: "DELETE /api/secrets/:id",
       },
     },
   });

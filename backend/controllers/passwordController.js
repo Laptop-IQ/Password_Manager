@@ -47,6 +47,7 @@ export const createPassword = async (req, res) => {
     const encryptedPassword = encryptPassword(password);
 
     const passwordData = await Password.create({
+      user: req.user._id,
       websiteName: websiteName.trim(),
       url: url.trim(),
       password: encryptedPassword,
@@ -83,7 +84,9 @@ export const getAllPasswords = async (req, res) => {
   try {
     // IMPORTANT:
     // Do NOT use .select("-password")
-    const passwords = await Password.find().sort({ createdAt: -1 }).lean();
+    const passwords = await Password.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
 
     const decryptedPasswords = passwords.map((item) => {
       try {
@@ -131,7 +134,10 @@ export const getPasswordById = async (req, res) => {
       });
     }
 
-    const passwordData = await Password.findById(id).lean();
+    const passwordData = await Password.findOne({
+      _id: id,
+      user: req.user._id,
+    }).lean();
 
     if (!passwordData) {
       return res.status(404).json({
@@ -207,10 +213,11 @@ export const updatePassword = async (req, res) => {
       updateData.password = encryptPassword(password);
     }
 
-    const updatedPassword = await Password.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-    }).lean();
+    const updatedPassword = await Password.findOneAndUpdate(
+      { _id: id, user: req.user._id },
+      updateData,
+      { new: true, runValidators: true },
+    ).lean();
 
     if (!updatedPassword) {
       return res.status(404).json({
@@ -253,7 +260,10 @@ export const deletePassword = async (req, res) => {
       });
     }
 
-    const deletedPassword = await Password.findByIdAndDelete(id);
+    const deletedPassword = await Password.findOneAndDelete({
+      _id: id,
+      user: req.user._id,
+    });
 
     if (!deletedPassword) {
       return res.status(404).json({

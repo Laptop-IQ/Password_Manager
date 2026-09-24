@@ -2,6 +2,13 @@ import mongoose from "mongoose";
 
 const passwordSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
     websiteName: {
       type: String,
       required: [true, "Website name is required"],
