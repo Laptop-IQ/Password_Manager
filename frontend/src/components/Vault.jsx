@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import CardForm from "./CardForm";
 import SecretForm, { SECRET_TYPES } from "./SecretForm";
@@ -21,6 +21,71 @@ const getErrorMessage = (error, fallback) =>
 const secretTypeLabel = (value) =>
   SECRET_TYPES.find((t) => t.value === value)?.label || "Other";
 
+// ============================================================
+// PREMIUM ICON BUTTONS (edit / delete)
+// ============================================================
+
+function EditIconButton({ onClick, disabled, label = "Edit" }) {
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      onClick={onClick}
+      disabled={disabled}
+      className="group/edit relative p-2 rounded-[10px] border border-transparent text-[#A8A4BD] bg-white/[0.03] hover:bg-[#8B72FF]/15 hover:border-[#8B72FF]/30 hover:text-[#C9BFFF] active:scale-90 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="transition-transform duration-150 group-hover/edit:-translate-y-0.5"
+      >
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+    </button>
+  );
+}
+
+function DeleteIconButton({ onClick, disabled, label = "Delete" }) {
+  return (
+    <button
+      type="button"
+      title={label}
+      aria-label={label}
+      onClick={onClick}
+      disabled={disabled}
+      className="group/del relative p-2 rounded-[10px] border border-transparent text-[#A8A4BD] bg-white/[0.03] hover:bg-[#F87171]/15 hover:border-[#F87171]/30 hover:text-[#F87171] active:scale-90 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="transition-transform duration-150 group-hover/del:rotate-6"
+      >
+        <path d="M3 6h18" />
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
+      </svg>
+    </button>
+  );
+}
+
 export default function Vault({ token }) {
   const [activeTab, setActiveTab] = useState("cards");
 
@@ -40,6 +105,19 @@ export default function Vault({ token }) {
 
   const [revealedCardFields, setRevealedCardFields] = useState({}); // { [id]: { number, cvv, pin } }
   const [revealedSecrets, setRevealedSecrets] = useState({});
+
+  // Auto-hide sensitive values 10s after they're revealed, for shoulder-surfing safety.
+  const AUTO_HIDE_MS = 10000;
+  const cardTimersRef = useRef({}); // { "id:field": timeoutId }
+  const secretTimersRef = useRef({}); // { id: timeoutId }
+
+  useEffect(() => {
+    // Clear all pending auto-hide timers when the page unmounts.
+    return () => {
+      Object.values(cardTimersRef.current).forEach(clearTimeout);
+      Object.values(secretTimersRef.current).forEach(clearTimeout);
+    };
+  }, []);
 
   // ============================================================
   // FETCH
@@ -105,10 +183,33 @@ export default function Vault({ token }) {
   };
 
   const toggleCardField = (id, field) => {
-    setRevealedCardFields((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], [field]: !prev?.[id]?.[field] },
-    }));
+    const key = `${id}:${field}`;
+
+    setRevealedCardFields((prev) => {
+      const isCurrentlyVisible = Boolean(prev?.[id]?.[field]);
+      const nextVisible = !isCurrentlyVisible;
+
+      // Cancel any existing auto-hide timer for this field either way.
+      if (cardTimersRef.current[key]) {
+        clearTimeout(cardTimersRef.current[key]);
+        delete cardTimersRef.current[key];
+      }
+
+      if (nextVisible) {
+        cardTimersRef.current[key] = setTimeout(() => {
+          setRevealedCardFields((current) => ({
+            ...current,
+            [id]: { ...current[id], [field]: false },
+          }));
+          delete cardTimersRef.current[key];
+        }, AUTO_HIDE_MS);
+      }
+
+      return {
+        ...prev,
+        [id]: { ...prev[id], [field]: nextVisible },
+      };
+    });
   };
 
   // ============================================================
@@ -132,7 +233,23 @@ export default function Vault({ token }) {
   };
 
   const toggleSecretVisible = (id) => {
-    setRevealedSecrets((prev) => ({ ...prev, [id]: !prev[id] }));
+    setRevealedSecrets((prev) => {
+      const nextVisible = !prev[id];
+
+      if (secretTimersRef.current[id]) {
+        clearTimeout(secretTimersRef.current[id]);
+        delete secretTimersRef.current[id];
+      }
+
+      if (nextVisible) {
+        secretTimersRef.current[id] = setTimeout(() => {
+          setRevealedSecrets((current) => ({ ...current, [id]: false }));
+          delete secretTimersRef.current[id];
+        }, AUTO_HIDE_MS);
+      }
+
+      return { ...prev, [id]: nextVisible };
+    });
   };
 
   // ============================================================
@@ -387,23 +504,17 @@ export default function Vault({ token }) {
                           </p>
                         </div>
 
-                        <div className="flex gap-1">
-                          <button
-                            type="button"
-                            title="Edit"
+                        <div className="flex gap-1.5">
+                          <EditIconButton
+                            label="Edit card"
+                            disabled={isDeleting}
                             onClick={() => handleEditCard(card)}
-                            className="p-1.5 text-[#A8A4BD] hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            title="Delete"
+                          />
+                          <DeleteIconButton
+                            label="Delete card"
+                            disabled={isDeleting}
                             onClick={() => setDeleteTarget({ type: "card", item: card })}
-                            className="p-1.5 text-[#A8A4BD] hover:text-[#F87171] hover:bg-[#F87171]/10 rounded-lg transition-colors"
-                          >
-                            🗑️
-                          </button>
+                          />
                         </div>
                       </div>
 
@@ -417,6 +528,7 @@ export default function Vault({ token }) {
                           <div className="flex gap-2.5">
                             <button
                               type="button"
+                              title={revealed.number ? "Auto-hides in 10s" : "Show"}
                               onClick={() => toggleCardField(id, "number")}
                               className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
                             >
@@ -445,6 +557,7 @@ export default function Vault({ token }) {
                             </span>
                             <button
                               type="button"
+                              title={revealed.cvv ? "Auto-hides in 10s" : "Show CVV"}
                               onClick={() => toggleCardField(id, "cvv")}
                               className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
                             >
@@ -464,6 +577,7 @@ export default function Vault({ token }) {
                             <div className="flex gap-2.5">
                               <button
                                 type="button"
+                                title={revealed.pin ? "Auto-hides in 10s" : "Show"}
                                 onClick={() => toggleCardField(id, "pin")}
                                 className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
                               >
@@ -557,6 +671,7 @@ export default function Vault({ token }) {
                           </span>
                           <button
                             type="button"
+                            title={isVisible ? "Auto-hides in 10s" : "Show"}
                             onClick={() => toggleSecretVisible(id)}
                             className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
                           >
@@ -570,23 +685,17 @@ export default function Vault({ token }) {
                             Copy
                           </button>
                         </div>
-                        <div className="md:col-span-2 flex justify-end gap-1">
-                          <button
-                            type="button"
-                            title="Edit"
+                        <div className="md:col-span-2 flex justify-end gap-1.5">
+                          <EditIconButton
+                            label="Edit secret"
+                            disabled={isDeleting}
                             onClick={() => handleEditSecret(secret)}
-                            className="p-1.5 text-[#A8A4BD] hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            title="Delete"
+                          />
+                          <DeleteIconButton
+                            label="Delete secret"
+                            disabled={isDeleting}
                             onClick={() => setDeleteTarget({ type: "secret", item: secret })}
-                            className="p-1.5 text-[#A8A4BD] hover:text-[#F87171] hover:bg-[#F87171]/10 rounded-lg transition-colors"
-                          >
-                            🗑️
-                          </button>
+                          />
                         </div>
                       </div>
                     );

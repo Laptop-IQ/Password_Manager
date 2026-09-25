@@ -491,7 +491,7 @@ export default function Hero({ token }) {
         );
 
         /* DELETE API */
-        const response = await axios.delete(
+        await axios.delete(
           `${API_URL}/passwords/${encodeURIComponent(id)}`,
           {
             headers: {
@@ -500,8 +500,6 @@ export default function Hero({ token }) {
             timeout: 15000,
           },
         );
-
-        console.log("DELETE PASSWORD SUCCESS:", response?.data);
 
         /* Cleanup UI state */
         setVisiblePasswords((prev) => {
