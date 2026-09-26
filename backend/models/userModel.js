@@ -10,8 +10,12 @@ const userSchema = new mongoose.Schema(
 
     otp: String,
     otpExpire: Date,
-    profilePic: String, // ✅ add this
-    cloudinaryId: String, // ✅ add this
+
+    // ---- Two-Factor Authentication (login) ----
+    twoFactorEnabled: { type: Boolean, default: false },
+    twoFactorSecret: { type: String, default: null }, // encrypted base32 secret
+    twoFactorTempSecret: { type: String, default: null }, // encrypted, set during setup until confirmed
+    twoFactorRecoveryCodes: { type: [String], default: [] }, // hashed one-time recovery codes
   },
   { timestamps: true },
 );

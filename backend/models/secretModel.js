@@ -50,6 +50,17 @@ const secretSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+
+    category: {
+      type: String,
+      trim: true,
+      default: "General",
+    },
+
+    isFavorite: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

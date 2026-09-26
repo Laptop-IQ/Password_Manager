@@ -44,6 +44,12 @@ const Login = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [preAuthToken, setPreAuthToken] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [verifying2FA, setVerifying2FA] = useState(false);
+  const [twoFactorError, setTwoFactorError] = useState("");
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -132,6 +138,9 @@ const Login = ({ onLogin }) => {
   ======================================================= */
 
   const handleSubmit = async (event) => {
+    if (twoFactorRequired) {
+      return handleVerify2FA(event);
+    }
     event.preventDefault();
 
     if (isLoading) {
@@ -169,6 +178,13 @@ const Login = ({ onLogin }) => {
       );
 
       const data = response?.data || {};
+
+      if (data?.twoFactorRequired) {
+        setPreAuthToken(data.preAuthToken);
+        setTwoFactorRequired(true);
+        setIsLoading(false);
+        return;
+      }
 
       const token = data?.token;
       const profile = data?.user || data?.profile;
@@ -261,6 +277,53 @@ const Login = ({ onLogin }) => {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /* =======================================================
+     2FA VERIFICATION (second login step)
+  ======================================================= */
+
+  const handleVerify2FA = async (event) => {
+    event.preventDefault();
+    if (verifying2FA) return;
+
+    if (!twoFactorCode.trim()) {
+      setTwoFactorError("Enter the 6-digit code from your authenticator app.");
+      return;
+    }
+
+    setVerifying2FA(true);
+    setTwoFactorError("");
+
+    try {
+      const response = await axios.post(
+        `${USER_API}/login/verify-2fa`,
+        { preAuthToken, code: twoFactorCode.trim() },
+        { headers: { "Content-Type": "application/json" }, timeout: 15000 },
+      );
+
+      const data = response?.data || {};
+      const token = data?.token;
+
+      if (!token) throw new Error("Verification succeeded but no token was returned.");
+
+      const userData = data?.user || { email: email.trim().toLowerCase() };
+
+      if (typeof onLogin === "function") {
+        onLogin(userData, rememberMe, token);
+      }
+
+      setPassword("");
+      setTwoFactorCode("");
+      navigate(redirectAfterLogin, { replace: true });
+    } catch (err) {
+      console.error("[Login 2FA]", err?.response || err);
+      setTwoFactorError(
+        err?.response?.data?.message || "Invalid or expired code. Please try again.",
+      );
+    } finally {
+      setVerifying2FA(false);
     }
   };
 
@@ -531,6 +594,66 @@ const Login = ({ onLogin }) => {
             noValidate
             className="relative z-20 w-full"
           >
+            {twoFactorRequired ? (
+              <>
+                <div className="mb-6 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50">
+                    <Lock size={20} className="text-indigo-600" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Two-factor verification
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Enter the 6-digit code from your authenticator app, or a recovery code.
+                  </p>
+                </div>
+
+                {twoFactorError && (
+                  <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs text-red-600">
+                    <AlertCircle size={17} className="mt-0.5 shrink-0 text-red-500" />
+                    <span className="break-words leading-5">{twoFactorError}</span>
+                  </div>
+                )}
+
+                <label htmlFor="twoFactorCode" className="mb-1.5 block text-sm font-medium text-gray-700">
+                  Verification code
+                </label>
+                <input
+                  id="twoFactorCode"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  value={twoFactorCode}
+                  onChange={(e) => setTwoFactorCode(e.target.value)}
+                  placeholder="123456 or XXXXX-XXXXX"
+                  className="mb-5 w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-center text-lg tracking-[0.3em] text-gray-900 placeholder:tracking-normal placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                />
+
+                <button
+                  type="submit"
+                  disabled={verifying2FA}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-60"
+                >
+                  {verifying2FA ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+                  Verify &amp; sign in
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTwoFactorRequired(false);
+                    setTwoFactorCode("");
+                    setTwoFactorError("");
+                    setPreAuthToken(null);
+                  }}
+                  className="mt-3 w-full text-center text-sm text-gray-500 hover:text-gray-700"
+                >
+                  ← Back to login
+                </button>
+              </>
+            ) : (
+              <>
             {/* =================================================
                 EMAIL
             ================================================== */}
@@ -873,6 +996,8 @@ const Login = ({ onLogin }) => {
                 </>
               )}
             </button>
+              </>
+            )}
           </form>
 
           {/* =================================================

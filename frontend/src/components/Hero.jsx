@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import AddNewPassword from "./Add";
+import PasswordHistoryModal from "./PasswordHistoryModal";
 
 /* ============================================================
    API CONFIG
@@ -149,6 +150,44 @@ export default function Hero({ token }) {
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const [copiedId, setCopiedId] = useState(null);
   const [copiedUsernameId, setCopiedUsernameId] = useState(null);
+
+  /* ==========================================================
+     SEARCH / FILTER / FAVORITES
+  ========================================================== */
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState(null);
+  const [historyTarget, setHistoryTarget] = useState(null); // { id, websiteName }
+
+  const filteredPasswords = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return passwords.filter((p) => {
+      if (favoritesOnly && !p.isFavorite) return false;
+      if (!q) return true;
+      return [p.websiteName, p.url, p.username, p.category, ...(p.tags || [])]
+        .some((v) => String(v || "").toLowerCase().includes(q));
+    });
+  }, [passwords, searchQuery, favoritesOnly]);
+
+  const toggleFavorite = async (item) => {
+    const id = item._id || item.id;
+    try {
+      setTogglingFavoriteId(id);
+      await axios.put(
+        `${API_URL}/passwords/${id}`,
+        { ...item, isFavorite: !item.isFavorite },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setPasswords((prev) =>
+        prev.map((p) => ((p._id || p.id) === id ? { ...p, isFavorite: !p.isFavorite } : p)),
+      );
+    } catch (err) {
+      console.error("TOGGLE FAVORITE ERROR:", err);
+    } finally {
+      setTogglingFavoriteId(null);
+    }
+  };
 
   /* ==========================================================
      DELETE STATE
@@ -756,6 +795,36 @@ export default function Hero({ token }) {
         )}
 
         {/* ====================================================
+            SEARCH & FILTER
+        ==================================================== */}
+
+        {!loading && passwords.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="relative flex-1">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A4BD] text-[14px]">⌕</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by website, username, category, tag..."
+                className="w-full bg-white/[0.03] border border-white/10 text-[#F5F3FF] text-[14px] pl-9 pr-4 py-2.5 rounded-[12px] placeholder:text-[#726C8A] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]/40"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setFavoritesOnly((v) => !v)}
+              className={`px-4 py-2.5 rounded-[12px] text-[13px] font-semibold border transition-colors whitespace-nowrap ${
+                favoritesOnly
+                  ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
+                  : "bg-white/[0.03] border-white/10 text-[#A8A4BD] hover:text-white"
+              }`}
+            >
+              {favoritesOnly ? "★" : "☆"} Favorites
+            </button>
+          </div>
+        )}
+
+        {/* ====================================================
             LOADING
         ==================================================== */}
 
@@ -795,6 +864,10 @@ export default function Hero({ token }) {
               + Add your first password
             </button>
           </div>
+        ) : filteredPasswords.length === 0 ? (
+          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[48px] text-center">
+            <p className="text-[15px] text-[#A8A4BD]">No passwords match your search or filter.</p>
+          </div>
         ) : (
           /* ==================================================
              PASSWORD TABLE
@@ -818,7 +891,7 @@ export default function Hero({ token }) {
             {/* ITEMS */}
 
             <div className="flex flex-col divide-y divide-white/10">
-              {passwords.map((item, index) => {
+              {filteredPasswords.map((item, index) => {
                 const realId = getPasswordId(item);
 
                 const id = realId || `fallback-${index}`;
@@ -1096,6 +1169,25 @@ export default function Hero({ token }) {
                     ================================================== */}
 
                     <div className="md:col-span-2 flex items-center justify-end gap-[4px]">
+                      {/* FAVORITE */}
+
+                      <button
+                        type="button"
+                        onClick={() => toggleFavorite(item)}
+                        disabled={togglingFavoriteId === realId}
+                        className={`p-[8px] rounded-[6px] transition-colors cursor-pointer disabled:opacity-40 ${
+                          item.isFavorite
+                            ? "text-[#FBBF24] bg-[#FBBF24]/10 hover:bg-[#FBBF24]/20"
+                            : "text-[#A8A4BD] hover:text-[#FBBF24] hover:bg-[#FBBF24]/10"
+                        }`}
+                        aria-label="Toggle favorite"
+                        title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill={item.isFavorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      </button>
+
                       {/* EDIT */}
 
                       <button
@@ -1157,12 +1249,38 @@ export default function Hero({ token }) {
                           </svg>
                         )}
                       </button>
+
+                      {/* HISTORY */}
+
+                      <button
+                        type="button"
+                        onClick={() => setHistoryTarget({ id: realId, websiteName: item.websiteName })}
+                        disabled={!realId}
+                        className="text-[#A8A4BD] hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
+                        aria-label="View password history"
+                        title="History"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 3v5h5" />
+                          <path d="M3.05 13a9 9 0 1 0 2.13-6.36L3 8" />
+                          <path d="M12 7v5l4 2" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
+        )}
+
+        {historyTarget && (
+          <PasswordHistoryModal
+            passwordId={historyTarget.id}
+            websiteName={historyTarget.websiteName}
+            token={token}
+            onClose={() => setHistoryTarget(null)}
+          />
         )}
       </main>
 

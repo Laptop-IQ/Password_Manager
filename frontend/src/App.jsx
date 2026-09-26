@@ -17,6 +17,8 @@ import VerifyOtp from "./Context/VerifyOtp";
 import ForgotPassword from "./Context/ForgotPassword";
 import Hero from "./components/Hero";
 import Vault from "./components/Vault";
+import SecuritySettings from "./components/SecuritySettings";
+import SecurityDashboard from "./components/SecurityDashboard";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -470,6 +472,26 @@ export default function App() {
             element={
               <ProtectedRoute user={user} token={token}>
                 <Vault token={token} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Account Security (2FA + sessions) */}
+          <Route
+            path="/security"
+            element={
+              <ProtectedRoute user={user} token={token}>
+                <SecuritySettings token={token} twoFactorEnabled={user?.twoFactorEnabled} />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Security Dashboard (weak/duplicate/breach audit) */}
+          <Route
+            path="/security/audit"
+            element={
+              <ProtectedRoute user={user} token={token}>
+                <SecurityDashboard token={token} />
               </ProtectedRoute>
             }
           />

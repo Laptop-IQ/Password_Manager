@@ -31,6 +31,20 @@ export default function Navbar({ user, onLogout }) {
                 Cards &amp; Secrets
               </Link>
 
+              <Link
+                to="/security"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
+              >
+                Security
+              </Link>
+
+              <Link
+                to="/security/audit"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
+              >
+                Audit
+              </Link>
+
               <span className="hidden text-sm text-slate-300 sm:block">
                 {user.name || user.email}
               </span>

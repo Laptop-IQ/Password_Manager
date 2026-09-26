@@ -17,6 +17,9 @@ const EMPTY_FORM = {
   username: "",
   password: "",
   notes: "",
+  category: "General",
+  tags: "",
+  isFavorite: false,
 };
 
 export default function AddNewPassword({
@@ -53,6 +56,9 @@ export default function AddNewPassword({
         username: editPassword.username || "",
         password: editPassword.password || "",
         notes: editPassword.notes || "",
+        category: editPassword.category || "General",
+        tags: (editPassword.tags || []).join(", "),
+        isFavorite: Boolean(editPassword.isFavorite),
       });
 
       // Edit me password visible rakhna optional hai.
@@ -747,6 +753,54 @@ export default function AddNewPassword({
                   onChange={handleFormChange}
                   disabled={loading}
                 />
+              </div>
+
+              {/* Category, Tags & Favorite */}
+
+              <div className="grid grid-cols-2 gap-3 pb-4">
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-semibold text-[#F5F3FF]" htmlFor="category">
+                    Category
+                  </label>
+                  <input
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleFormChange}
+                    disabled={loading}
+                    placeholder="General"
+                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-[13px] font-semibold text-[#F5F3FF]" htmlFor="tags">
+                    Tags (comma separated)
+                  </label>
+                  <input
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleFormChange}
+                    disabled={loading}
+                    placeholder="work, banking"
+                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF]"
+                  />
+                </div>
+              </div>
+
+              <div className="pb-4">
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }))}
+                  disabled={loading}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-semibold border transition-colors ${
+                    formData.isFavorite
+                      ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
+                      : "bg-[#1A1625] border-white/10 text-[#A8A4BD] hover:text-white"
+                  }`}
+                >
+                  {formData.isFavorite ? "★" : "☆"} Mark as favorite
+                </button>
               </div>
             </div>
 

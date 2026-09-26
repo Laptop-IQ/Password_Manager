@@ -1,8 +1,10 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import CardForm from "./CardForm";
 import SecretForm, { SECRET_TYPES } from "./SecretForm";
+import AuthenticatorForm from "./AuthenticatorForm";
+import { generateTotpCode, secondsRemainingInPeriod } from "../utils/totp";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -18,12 +20,89 @@ const getId = (item) => String(item?._id ?? item?.id ?? "");
 const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.message || fallback;
 
+// ============================================================
+// LIVE TOTP CODE DISPLAY (self-updating, one per authenticator card)
+// ============================================================
+
+function TotpCodeDisplay({ secret }) {
+  const [code, setCode] = useState("······");
+  const [secondsLeft, setSecondsLeft] = useState(secondsRemainingInPeriod());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const tick = async () => {
+      const remaining = secondsRemainingInPeriod();
+      setSecondsLeft(remaining);
+      const newCode = await generateTotpCode(secret);
+      if (!cancelled) setCode(newCode || "Invalid");
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [secret]);
+
+  const pct = (secondsLeft / 30) * 100;
+
+  return (
+    <div className="flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
+      <span className="font-mono text-[20px] tracking-[0.15em] text-[#F5F3FF]">
+        {code.match(/.{1,3}/g)?.join(" ") || code}
+      </span>
+      <div className="relative w-7 h-7 shrink-0">
+        <svg viewBox="0 0 36 36" className="w-7 h-7 -rotate-90">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+          <circle
+            cx="18"
+            cy="18"
+            r="15.5"
+            fill="none"
+            stroke={secondsLeft <= 5 ? "#F87171" : "#8B72FF"}
+            strokeWidth="3"
+            strokeDasharray={`${(pct / 100) * 97.4} 97.4`}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-linear"
+          />
+        </svg>
+        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-[#A8A4BD]">
+          {secondsLeft}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const secretTypeLabel = (value) =>
   SECRET_TYPES.find((t) => t.value === value)?.label || "Other";
 
 // ============================================================
 // PREMIUM ICON BUTTONS (edit / delete)
 // ============================================================
+
+function FavoriteButton({ active, onClick, disabled }) {
+  return (
+    <button
+      type="button"
+      title={active ? "Remove from favorites" : "Add to favorites"}
+      aria-label="Toggle favorite"
+      onClick={onClick}
+      disabled={disabled}
+      className={`p-2 rounded-[10px] transition-all duration-150 active:scale-90 disabled:opacity-40 disabled:pointer-events-none ${
+        active
+          ? "text-[#FBBF24] bg-[#FBBF24]/10 hover:bg-[#FBBF24]/20"
+          : "text-[#A8A4BD] bg-white/[0.03] hover:text-[#FBBF24] hover:bg-[#FBBF24]/10"
+      }`}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+      </svg>
+    </button>
+  );
+}
 
 function EditIconButton({ onClick, disabled, label = "Edit" }) {
   return (
@@ -91,6 +170,15 @@ export default function Vault({ token }) {
 
   const [cards, setCards] = useState([]);
   const [secrets, setSecrets] = useState([]);
+  const [authItems, setAuthItems] = useState([]);
+
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [editAuthItem, setEditAuthItem] = useState(null);
+
+  // Search / filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -127,6 +215,7 @@ export default function Vault({ token }) {
     if (!token) {
       setCards([]);
       setSecrets([]);
+      setAuthItems([]);
       setLoading(false);
       return;
     }
@@ -135,7 +224,7 @@ export default function Vault({ token }) {
       setLoading(true);
       setError(null);
 
-      const [cardsRes, secretsRes] = await Promise.all([
+      const [cardsRes, secretsRes, authRes] = await Promise.all([
         axios.get(`${API_URL}/cards`, {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 15000,
@@ -144,10 +233,15 @@ export default function Vault({ token }) {
           headers: { Authorization: `Bearer ${token}` },
           timeout: 15000,
         }),
+        axios.get(`${API_URL}/totp`, {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 15000,
+        }),
       ]);
 
       setCards(Array.isArray(cardsRes?.data?.data) ? cardsRes.data.data : []);
       setSecrets(Array.isArray(secretsRes?.data?.data) ? secretsRes.data.data : []);
+      setAuthItems(Array.isArray(authRes?.data?.data) ? authRes.data.data : []);
     } catch (err) {
       console.error("FETCH VAULT ERROR:", err);
       const message = getErrorMessage(err, "Failed to load your vault. Please try again.");
@@ -253,6 +347,86 @@ export default function Vault({ token }) {
   };
 
   // ============================================================
+  // AUTHENTICATOR (TOTP) HANDLERS
+  // ============================================================
+
+  const handleAddAuth = () => {
+    setEditAuthItem(null);
+    setAuthModalOpen(true);
+  };
+
+  const handleEditAuth = (item) => {
+    setEditAuthItem(item);
+    setAuthModalOpen(true);
+  };
+
+  const handleAuthSaved = async () => {
+    setAuthModalOpen(false);
+    setEditAuthItem(null);
+    await fetchAll();
+  };
+
+  // ============================================================
+  // FAVORITE TOGGLE
+  // ============================================================
+
+  const toggleFavorite = async (type, item) => {
+    const id = getId(item);
+    const endpoint = type === "card" ? "cards" : type === "totp" ? "totp" : "secrets";
+
+    try {
+      setTogglingFavoriteId(id);
+      await axios.put(
+        `${API_URL}/${endpoint}/${id}`,
+        { ...item, isFavorite: !item.isFavorite },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      const updater = (list) =>
+        list.map((entry) => (getId(entry) === id ? { ...entry, isFavorite: !entry.isFavorite } : entry));
+
+      if (type === "card") setCards(updater);
+      else if (type === "totp") setAuthItems(updater);
+      else setSecrets(updater);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Failed to update favorite."));
+    } finally {
+      setTogglingFavoriteId(null);
+    }
+  };
+
+  // ============================================================
+  // SEARCH / FILTER
+  // ============================================================
+
+  const matchesQuery = (haystack, query) =>
+    !query || haystack.some((v) => String(v || "").toLowerCase().includes(query));
+
+  const filteredCards = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return cards.filter((c) => {
+      if (favoritesOnly && !c.isFavorite) return false;
+      return matchesQuery([c.nickname, c.bankName, c.cardholderName, c.category], q);
+    });
+  }, [cards, searchQuery, favoritesOnly]);
+
+  const filteredSecrets = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return secrets.filter((s) => {
+      if (favoritesOnly && !s.isFavorite) return false;
+      return matchesQuery([s.title, s.issuer, s.category], q);
+    });
+  }, [secrets, searchQuery, favoritesOnly]);
+
+  const filteredAuthItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return authItems.filter((a) => {
+      if (favoritesOnly && !a.isFavorite) return false;
+      return matchesQuery([a.issuer, a.accountName, a.category], q);
+    });
+  }, [authItems, searchQuery, favoritesOnly]);
+
+  // ============================================================
   // COPY
   // ============================================================
 
@@ -278,13 +452,20 @@ export default function Vault({ token }) {
     try {
       setDeletingId(id);
 
-      const endpoint = deleteTarget.type === "card" ? "cards" : "secrets";
+      const endpoint =
+        deleteTarget.type === "card"
+          ? "cards"
+          : deleteTarget.type === "totp"
+          ? "totp"
+          : "secrets";
 
       await axios.delete(`${API_URL}/${endpoint}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast.success(deleteTarget.type === "card" ? "Card deleted" : "Secret deleted");
+      const label =
+        deleteTarget.type === "card" ? "Card" : deleteTarget.type === "totp" ? "Authenticator" : "Secret";
+      toast.success(`${label} deleted`);
 
       setDeleteTarget(null);
       await fetchAll();
@@ -333,6 +514,18 @@ export default function Vault({ token }) {
         />
       )}
 
+      {authModalOpen && (
+        <AuthenticatorForm
+          onClose={() => {
+            setAuthModalOpen(false);
+            setEditAuthItem(null);
+          }}
+          onSaved={handleAuthSaved}
+          token={token}
+          editItem={editAuthItem}
+        />
+      )}
+
       {deleteTarget && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
@@ -349,7 +542,13 @@ export default function Vault({ token }) {
               🗑️
             </div>
             <h3 className="text-[20px] font-bold text-[#F5F3FF]">
-              Delete {deleteTarget.type === "card" ? "card" : "secret"}?
+              Delete{" "}
+              {deleteTarget.type === "card"
+                ? "card"
+                : deleteTarget.type === "totp"
+                ? "authenticator"
+                : "secret"}
+              ?
             </h3>
             <p className="text-[14px] text-[#A8A4BD] mt-2 leading-6">
               This action cannot be undone.
@@ -414,6 +613,42 @@ export default function Vault({ token }) {
           >
             🔑 Secrets &amp; TPINs <span className="opacity-70">({secrets.length})</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("auth")}
+            className={`px-5 py-2.5 text-[14px] font-semibold rounded-[10px] transition-all ${
+              activeTab === "auth"
+                ? "bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white shadow-[0_4px_16px_rgba(139,114,255,0.35)]"
+                : "text-[#A8A4BD] hover:text-white"
+            }`}
+          >
+            🔐 Authenticator <span className="opacity-70">({authItems.length})</span>
+          </button>
+        </div>
+
+        {/* SEARCH & FILTER */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A4BD] text-[14px]">⌕</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, bank, issuer, category..."
+              className="w-full bg-white/[0.03] border border-white/10 text-[#F5F3FF] text-[14px] pl-9 pr-4 py-2.5 rounded-[12px] placeholder:text-[#726C8A] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]/40"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setFavoritesOnly((v) => !v)}
+            className={`px-4 py-2.5 rounded-[12px] text-[13px] font-semibold border transition-colors whitespace-nowrap ${
+              favoritesOnly
+                ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
+                : "bg-white/[0.03] border-white/10 text-[#A8A4BD] hover:text-white"
+            }`}
+          >
+            {favoritesOnly ? "★" : "☆"} Favorites
+          </button>
         </div>
 
         {error && (
@@ -446,7 +681,7 @@ export default function Vault({ token }) {
               </button>
             </div>
 
-            {cards.length === 0 ? (
+            {filteredCards.length === 0 ? (
               <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
                 <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
                   💳
@@ -465,7 +700,7 @@ export default function Vault({ token }) {
               </div>
             ) : (
               <div className="grid gap-5 sm:grid-cols-2">
-                {cards.map((card) => {
+                {filteredCards.map((card) => {
                   const id = getId(card);
                   const revealed = revealedCardFields[id] || {};
                   const isDeleting = deletingId === id;
@@ -505,6 +740,11 @@ export default function Vault({ token }) {
                         </div>
 
                         <div className="flex gap-1.5">
+                          <FavoriteButton
+                            active={Boolean(card.isFavorite)}
+                            disabled={togglingFavoriteId === id}
+                            onClick={() => toggleFavorite("card", card)}
+                          />
                           <EditIconButton
                             label="Edit card"
                             disabled={isDeleting}
@@ -604,7 +844,7 @@ export default function Vault({ token }) {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === "secrets" ? (
           <>
             <div className="flex justify-end mb-5">
               <button
@@ -616,7 +856,7 @@ export default function Vault({ token }) {
               </button>
             </div>
 
-            {secrets.length === 0 ? (
+            {filteredSecrets.length === 0 ? (
               <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
                 <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
                   🔑
@@ -644,7 +884,7 @@ export default function Vault({ token }) {
                 </div>
 
                 <div className="flex flex-col divide-y divide-white/10">
-                  {secrets.map((secret) => {
+                  {filteredSecrets.map((secret) => {
                     const id = getId(secret);
                     const isVisible = Boolean(revealedSecrets[id]);
                     const isDeleting = deletingId === id;
@@ -686,6 +926,11 @@ export default function Vault({ token }) {
                           </button>
                         </div>
                         <div className="md:col-span-2 flex justify-end gap-1.5">
+                          <FavoriteButton
+                            active={Boolean(secret.isFavorite)}
+                            disabled={togglingFavoriteId === id}
+                            onClick={() => toggleFavorite("secret", secret)}
+                          />
                           <EditIconButton
                             label="Edit secret"
                             disabled={isDeleting}
@@ -701,6 +946,83 @@ export default function Vault({ token }) {
                     );
                   })}
                 </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="flex justify-end mb-5">
+              <button
+                type="button"
+                onClick={handleAddAuth}
+                className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold shadow-[0_4px_16px_rgba(139,114,255,0.3)] transition-all hover:-translate-y-0.5"
+              >
+                + Add Authenticator
+              </button>
+            </div>
+
+            {filteredAuthItems.length === 0 ? (
+              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
+                <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
+                  🔐
+                </div>
+                <h3 className="text-[18px] font-semibold text-[#F5F3FF] mb-2">No authenticators yet</h3>
+                <p className="text-[14px] text-[#A8A4BD] mb-6">
+                  Store a TOTP secret to generate live 6-digit codes for another site's 2FA.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleAddAuth}
+                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold transition-all"
+                >
+                  + Add your first authenticator
+                </button>
+              </div>
+            ) : (
+              <div className="grid gap-5 sm:grid-cols-2">
+                {filteredAuthItems.map((item) => {
+                  const id = getId(item);
+                  const isDeleting = deletingId === id;
+
+                  return (
+                    <div
+                      key={id}
+                      className={`relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] p-5 transition-all hover:border-white/20 ${
+                        isDeleting ? "opacity-60" : ""
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-[16px] font-bold text-[#F5F3FF]">{item.issuer}</h3>
+                          {item.accountName && (
+                            <p className="text-[12px] text-[#A8A4BD]">{item.accountName}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          <FavoriteButton
+                            active={Boolean(item.isFavorite)}
+                            disabled={togglingFavoriteId === id}
+                            onClick={() => toggleFavorite("totp", item)}
+                          />
+                          <EditIconButton
+                            label="Edit authenticator"
+                            disabled={isDeleting}
+                            onClick={() => handleEditAuth(item)}
+                          />
+                          <DeleteIconButton
+                            label="Delete authenticator"
+                            disabled={isDeleting}
+                            onClick={() => setDeleteTarget({ type: "totp", item })}
+                          />
+                        </div>
+                      </div>
+
+                      <TotpCodeDisplay secret={item.secret} />
+
+                      {item.notes && <p className="text-[12px] text-[#A8A4BD] italic pt-2">{item.notes}</p>}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </>

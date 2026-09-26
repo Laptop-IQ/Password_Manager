@@ -53,7 +53,7 @@ const decryptSecret = (item) => {
 
 export const createSecret = async (req, res) => {
   try {
-    const { title, secretType, value, issuer, notes } = req.body;
+    const { title, secretType, value, issuer, notes, category, isFavorite } = req.body;
 
     const validationErrors = validateSecretInput(title, secretType, value);
 
@@ -72,6 +72,8 @@ export const createSecret = async (req, res) => {
       value: encryptPassword(String(value)),
       issuer: issuer?.trim() || null,
       notes: notes?.trim() || null,
+      category: category?.trim() || "General",
+      isFavorite: Boolean(isFavorite),
     });
 
     const safeData = decryptSecret(secretData.toObject());
@@ -166,7 +168,7 @@ export const updateSecret = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { title, secretType, value, issuer, notes } = req.body;
+    const { title, secretType, value, issuer, notes, category, isFavorite } = req.body;
 
     if (!/^[0-9a-fA-F]{24}$/.test(id)) {
       return res.status(400).json({
@@ -194,6 +196,8 @@ export const updateSecret = async (req, res) => {
       secretType: secretType || "other",
       issuer: issuer?.trim() || null,
       notes: notes?.trim() || null,
+      category: category?.trim() || "General",
+      isFavorite: Boolean(isFavorite),
     };
 
     // Only re-encrypt when a new value is supplied

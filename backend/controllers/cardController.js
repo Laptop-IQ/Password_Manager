@@ -137,6 +137,8 @@ export const createCard = async (req, res) => {
       pin,
       nickname,
       notes,
+      category,
+      isFavorite,
     } = req.body;
 
     const validationErrors = validateCardInput({
@@ -171,6 +173,8 @@ export const createCard = async (req, res) => {
       pin: pin ? encryptPassword(String(pin)) : null,
       nickname: nickname?.trim() || null,
       notes: notes?.trim() || null,
+      category: category?.trim() || "General",
+      isFavorite: Boolean(isFavorite),
     });
 
     const safeData = decryptCard(cardData.toObject());
@@ -283,6 +287,8 @@ export const updateCard = async (req, res) => {
       pin,
       nickname,
       notes,
+      category,
+      isFavorite,
     } = req.body;
 
     const validationErrors = validateCardInput({
@@ -316,6 +322,8 @@ export const updateCard = async (req, res) => {
       pin: pin ? encryptPassword(String(pin)) : null,
       nickname: nickname?.trim() || null,
       notes: notes?.trim() || null,
+      category: category?.trim() || "General",
+      isFavorite: Boolean(isFavorite),
     };
 
     const updatedCard = await Card.findOneAndUpdate(

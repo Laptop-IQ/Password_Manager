@@ -27,6 +27,8 @@ const EMPTY_FORM = {
   value: "",
   issuer: "",
   notes: "",
+  category: "General",
+  isFavorite: false,
 };
 
 export default function SecretForm({ onClose, onSaved, token, editSecret = null }) {
@@ -44,6 +46,8 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
         value: editSecret.value || "",
         issuer: editSecret.issuer || "",
         notes: editSecret.notes || "",
+        category: editSecret.category || "General",
+        isFavorite: Boolean(editSecret.isFavorite),
       });
     } else {
       setFormData(EMPTY_FORM);
@@ -221,6 +225,34 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               disabled={loading}
               className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="block text-[13px] font-semibold text-[#F5F3FF]">Category</label>
+              <input
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={loading}
+                placeholder="General"
+                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+              />
+            </div>
+            <div className="space-y-1.5 flex items-end">
+              <button
+                type="button"
+                onClick={() => setFormData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }))}
+                disabled={loading}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-[13px] font-semibold border transition-colors ${
+                  formData.isFavorite
+                    ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
+                    : "bg-black/20 border-white/10 text-[#A8A4BD] hover:text-white"
+                }`}
+              >
+                {formData.isFavorite ? "★" : "☆"} Favorite
+              </button>
+            </div>
           </div>
         </div>
 

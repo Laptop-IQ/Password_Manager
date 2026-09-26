@@ -10,6 +10,7 @@ import userRouter from "./routes/userRoute.js";
 import passwordRouter from "./routes/password.route.js";
 import cardRouter from "./routes/card.route.js";
 import secretRouter from "./routes/secret.route.js";
+import totpRouter from "./routes/totp.route.js";
 import connectDB from "./config/db.js";
 
 // ============================================================================
@@ -184,6 +185,7 @@ app.use("/api/user/verify-forgot-otp", authLimiter);
 app.use("/api/passwords", passwordLimiter);
 app.use("/api/cards", passwordLimiter);
 app.use("/api/secrets", passwordLimiter);
+app.use("/api/totp", passwordLimiter);
 
 // ============================================================================
 // BODY PARSING MIDDLEWARE
@@ -277,6 +279,9 @@ app.use("/api/cards", cardRouter);
 // Secrets vault routes (TPIN, UPI PIN, and other sensitive codes)
 app.use("/api/secrets", secretRouter);
 
+// TOTP authenticator vault routes (2FA codes for other sites)
+app.use("/api/totp", totpRouter);
+
 // ============================================================================
 // ROOT & DOCUMENTATION
 // ============================================================================
@@ -293,6 +298,7 @@ app.get("/", (req, res) => {
       passwords: "/api/passwords",
       cards: "/api/cards",
       secrets: "/api/secrets",
+      totp: "/api/totp",
     },
     documentation: {
       passwords: {

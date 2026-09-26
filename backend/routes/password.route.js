@@ -4,6 +4,7 @@ import {
   createPassword,
   getAllPasswords,
   getPasswordById,
+  getPasswordHistory,
   updatePassword,
   deletePassword,
 } from "../controllers/passwordController.js";
@@ -21,6 +22,9 @@ router.get("/", getAllPasswords);
 
 // Get single password by ID (only if it belongs to the logged-in user)
 router.get("/:id", getPasswordById);
+
+// Get password change history (only if it belongs to the logged-in user)
+router.get("/:id/history", getPasswordHistory);
 
 // Update password (only if it belongs to the logged-in user)
 router.put("/:id", updatePassword);

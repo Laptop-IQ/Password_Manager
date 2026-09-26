@@ -37,6 +37,31 @@ const passwordSchema = new mongoose.Schema(
       trim: true,
       default: null,
     },
+
+    category: {
+      type: String,
+      trim: true,
+      default: "General",
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+    },
+
+    isFavorite: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Snapshot of previous encrypted passwords, newest first.
+    // Populated automatically whenever the password field changes.
+    history: [
+      {
+        password: { type: String }, // encrypted, same as the main field
+        changedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,
