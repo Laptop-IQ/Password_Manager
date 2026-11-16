@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import {
   Navigate,
   Route,
@@ -10,15 +10,16 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar";
+import { PageSkeleton } from "./components/Skeleton";
 
-import Login from "./Context/Login";
-import Signup from "./Context/Signup";
-import VerifyOtp from "./Context/VerifyOtp";
-import ForgotPassword from "./Context/ForgotPassword";
-import Hero from "./components/Hero";
-import Vault from "./components/Vault";
-import SecuritySettings from "./components/SecuritySettings";
-import SecurityDashboard from "./components/SecurityDashboard";
+const Login = lazy(() => import("./Context/Login"));
+const Signup = lazy(() => import("./Context/Signup"));
+const VerifyOtp = lazy(() => import("./Context/VerifyOtp"));
+const ForgotPassword = lazy(() => import("./Context/ForgotPassword"));
+const Hero = lazy(() => import("./components/Hero"));
+const Vault = lazy(() => import("./components/Vault"));
+const SecuritySettings = lazy(() => import("./components/SecuritySettings"));
+const SecurityDashboard = lazy(() => import("./components/SecurityDashboard"));
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -446,6 +447,7 @@ export default function App() {
       <ScrollToTop />
       <Navbar user={user} onLogout={handleLogout} />
       <main className="pt-16 min-h-dvh">
+        <Suspense fallback={<PageSkeleton />}>
         <Routes>
           {/* Home */}
           <Route
@@ -523,6 +525,7 @@ export default function App() {
           {/* Unknown Route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </main>
     </>
   );

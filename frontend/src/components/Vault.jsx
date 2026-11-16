@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
+import { CardGridSkeleton, TableSkeleton } from "./Skeleton";
 import CardForm from "./CardForm";
 import SecretForm, { SECRET_TYPES } from "./SecretForm";
 import AuthenticatorForm from "./AuthenticatorForm";
@@ -693,10 +694,7 @@ export default function Vault({ token }) {
         )}
 
         {loading ? (
-          <div className="panel flex items-center justify-center gap-3 p-12 text-muted" role="status">
-            <span className="spinner text-accent" aria-hidden="true" />
-            <p className="text-sm">Loading your vault…</p>
-          </div>
+          (activeTab === "secrets" ? <TableSkeleton rows={4} label="Loading your vault" /> : <CardGridSkeleton label="Loading your vault" />)
         ) : activeTab === "cards" ? (
           filteredCards.length === 0 ? (
             <EmptyState

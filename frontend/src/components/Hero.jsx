@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import AddNewPassword from "./Add";
+import { TableSkeleton } from "./Skeleton";
 import PasswordHistoryModal from "./PasswordHistoryModal";
 import useEscapeKey from "../hooks/useEscapeKey";
 
@@ -732,7 +733,9 @@ export default function Hero({ token }) {
               Passwords
             </h1>
             <p className="mt-1 text-sm text-muted">
-              {passwords.length === 0
+              {loading
+                ? "Loading…"
+                : passwords.length === 0
                 ? "Nothing saved yet"
                 : `${passwords.length} saved ${passwords.length === 1 ? "login" : "logins"}, encrypted`}
             </p>
@@ -812,13 +815,7 @@ export default function Hero({ token }) {
         )}
 
         {loading ? (
-          <div
-            className="panel flex items-center justify-center gap-3 p-12 text-muted"
-            role="status"
-          >
-            <span className="spinner text-accent" aria-hidden="true" />
-            <p className="text-sm">Loading your passwords…</p>
-          </div>
+          <TableSkeleton label="Loading your passwords" />
         ) : passwords.length === 0 ? (
           <div className="panel px-6 py-16 text-center">
             <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-xl bg-sunken text-ink-soft">

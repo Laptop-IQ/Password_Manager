@@ -288,3 +288,19 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Loading skeletons: a single soft shimmer, off for reduced-motion users */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-sunken) 25%, #f7f5ef 50%, var(--color-sunken) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+/* Route content fades in once, so page swaps don't flash */
+.page-enter { animation: fade-in 0.2s ease-out; }
