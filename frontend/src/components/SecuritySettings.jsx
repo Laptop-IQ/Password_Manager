@@ -29,9 +29,9 @@ const formatRelativeTime = (dateStr) => {
 
 const describeDevice = (userAgent = "") => {
   const ua = userAgent.toLowerCase();
-  let device = "💻 Desktop";
-  if (/mobile|android|iphone/.test(ua)) device = "📱 Mobile";
-  else if (/ipad|tablet/.test(ua)) device = "📱 Tablet";
+  let device = "Desktop";
+  if (/mobile|android|iphone/.test(ua)) device = "Mobile";
+  else if (/ipad|tablet/.test(ua)) device = "Tablet";
 
   let browser = "Unknown browser";
   if (ua.includes("edg/")) browser = "Edge";
@@ -207,36 +207,32 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0A0810] font-['Inter',sans-serif] text-[#F5F3FF]">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 h-[420px] w-[420px] rounded-full bg-[#8B72FF]/20 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-[#FBBF24]/10 blur-[120px]" />
-      </div>
-
-      <main className="relative max-w-[800px] mx-auto px-[20px] md:px-[32px] pt-[56px] pb-[100px]">
-        <div className="mb-10">
-          <h2 className="text-[32px] font-extrabold font-['Manrope',sans-serif] bg-gradient-to-r from-white to-[#C9BFFF] bg-clip-text text-transparent">
-            Account Security
-          </h2>
-          <p className="text-[15px] text-[#A8A4BD] mt-1">
+    <div className="min-h-dvh bg-canvas text-ink">
+      <main className="mx-auto max-w-[800px] px-4 pb-24 pt-10 sm:px-8">
+        <div className="mb-8">
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+            Account security
+          </h1>
+          <p className="mt-1 text-sm text-muted">
             Two-factor authentication and active sessions for your account.
           </p>
         </div>
 
         {/* ================= 2FA CARD ================= */}
-        <section className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-6 mb-8">
+        <section className="panel mb-6 p-6">
           <div className="flex items-start justify-between gap-4 mb-2">
             <div>
-              <h3 className="text-[17px] font-bold flex items-center gap-2">
-                🔐 Two-Factor Authentication
+              <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight">
+                <i className="ri-shield-keyhole-line text-[20px] text-ink-soft" aria-hidden="true" />
+                Two-factor authentication
                 {twoFactorEnabled && (
-                  <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#0B2E21] text-[#34D399] border border-[#34D399]/20">
-                    Enabled
+                  <span className="rounded bg-ok-tint px-1.5 py-0.5 text-xs font-medium text-ok">
+                    On
                   </span>
                 )}
-              </h3>
-              <p className="text-[13px] text-[#A8A4BD] mt-1 max-w-[480px]">
-                Require a 6-digit code from an authenticator app (Google Authenticator, Authy, etc.) every time you log in.
+              </h2>
+              <p className="text-[13px] text-muted mt-1 max-w-[480px]">
+                Ask for a 6-digit code from an authenticator app each time you log in.
               </p>
             </div>
           </div>
@@ -248,32 +244,32 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
                   <button
                     type="button"
                     onClick={() => setShowDisableForm(true)}
-                    className="px-4 py-2.5 rounded-[10px] bg-[#F87171]/15 hover:bg-[#F87171]/25 text-[#F87171] text-[13px] font-semibold transition-colors"
+                    className="btn btn-secondary !text-danger"
                   >
-                    Disable 2FA
+                    Turn off 2FA
                   </button>
                 ) : (
                   <form onSubmit={handleDisable} className="max-w-[320px] space-y-3">
-                    <p className="text-[13px] text-[#A8A4BD]">Confirm your password to disable 2FA:</p>
+                    <p className="text-[13px] text-muted">Enter your password to turn off 2FA.</p>
                     <input
                       type="password"
                       value={disablePassword}
                       onChange={(e) => setDisablePassword(e.target.value)}
                       placeholder="Account password"
-                      className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+                      className="field"
                     />
                     <div className="flex gap-2">
                       <button
                         type="submit"
                         disabled={disabling}
-                        className="px-4 py-2.5 rounded-[10px] bg-[#F87171] hover:bg-[#B91C1C] text-[#1a0505] text-[13px] font-semibold disabled:opacity-50"
+                        className="btn btn-danger"
                       >
-                        {disabling ? "Disabling..." : "Confirm disable"}
+                        {disabling ? "Turning off" : "Turn off"}
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowDisableForm(false)}
-                        className="px-4 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-[13px] font-semibold"
+                        className="btn btn-secondary"
                       >
                         Cancel
                       </button>
@@ -285,54 +281,54 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
                   type="button"
                   onClick={startSetup}
                   disabled={settingUp}
-                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold disabled:opacity-50 transition-all"
+                  className="btn btn-primary disabled:opacity-50"
                 >
-                  {settingUp ? "Starting..." : "Enable 2FA"}
+                  {settingUp ? "Starting" : "Turn on 2FA"}
                 </button>
               )}
             </div>
           )}
 
           {setupStep === "qr" && (
-            <div className="mt-5 border-t border-white/10 pt-5">
-              <p className="text-[13px] text-[#A8A4BD] mb-3">
-                1. Scan this QR code with your authenticator app:
+            <div className="mt-5 border-t border-line pt-5">
+              <p className="text-[13px] text-muted mb-3">
+                Step 1. Scan this QR code with your authenticator app.
               </p>
               {qrCodeDataUrl && (
                 <img
                   src={qrCodeDataUrl}
                   alt="2FA QR code"
-                  className="w-[180px] h-[180px] rounded-[12px] border border-white/10 bg-white p-2 mb-3"
+                  className="h-[180px] w-[180px] rounded-lg border border-line bg-white p-2 mb-3"
                 />
               )}
               {manualSecret && (
-                <p className="text-[12px] text-[#A8A4BD] mb-4">
-                  Can't scan? Enter manually:{" "}
-                  <span className="font-mono text-[#C9BFFF]">{manualSecret}</span>
+                <p className="text-[12px] text-muted mb-4">
+                  Can’t scan? Enter this key instead:{" "}
+                  <span className="font-mono text-ink">{manualSecret}</span>
                 </p>
               )}
               <form onSubmit={confirmSetup} className="max-w-[280px] space-y-3">
-                <p className="text-[13px] text-[#A8A4BD]">2. Enter the 6-digit code:</p>
+                <p className="text-[13px] text-muted">Step 2. Enter the 6-digit code.</p>
                 <input
                   type="text"
                   autoFocus
                   value={setupCode}
                   onChange={(e) => setSetupCode(e.target.value)}
                   placeholder="123456"
-                  className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-center text-[18px] tracking-[0.3em] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+                  className="field text-center text-[18px] tracking-[0.3em]"
                 />
                 <div className="flex gap-2">
                   <button
                     type="submit"
                     disabled={settingUp}
-                    className="px-4 py-2.5 rounded-[10px] bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white text-[13px] font-semibold disabled:opacity-50"
+                    className="btn btn-primary disabled:opacity-50"
                   >
-                    {settingUp ? "Verifying..." : "Verify & Enable"}
+                    {settingUp ? "Verifying" : "Verify and turn on"}
                   </button>
                   <button
                     type="button"
                     onClick={finishSetup}
-                    className="px-4 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-[13px] font-semibold"
+                    className="btn btn-secondary"
                   >
                     Cancel
                   </button>
@@ -342,29 +338,31 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
           )}
 
           {setupStep === "recovery" && (
-            <div className="mt-5 border-t border-white/10 pt-5">
-              <p className="text-[13px] text-[#FBBF24] mb-3 font-semibold">
-                ⚠️ Save these recovery codes — each works once if you lose access to your authenticator app.
+            <div className="mt-5 border-t border-line pt-5">
+              <p className="mb-3 flex items-start gap-2 rounded-lg bg-warn-tint px-3 py-2.5 text-[13px] font-medium text-warn">
+                <i className="ri-error-warning-line mt-px text-[16px]" aria-hidden="true" />
+                Save these recovery codes now. Each one works once if you lose your authenticator app.
               </p>
-              <div className="grid grid-cols-2 gap-2 bg-black/20 border border-white/10 rounded-[12px] p-4 mb-4 font-mono text-[13px]">
+              <div className="grid grid-cols-2 gap-2 bg-canvas border border-line rounded-lg p-4 mb-4 font-mono text-[13px]">
                 {recoveryCodes.map((code) => (
-                  <div key={code} className="text-[#F5F3FF]">{code}</div>
+                  <div key={code} className="text-ink">{code}</div>
                 ))}
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={copyRecoveryCodes}
-                  className="px-4 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-[13px] font-semibold"
+                  className="btn btn-secondary"
                 >
+                  <i className="ri-file-copy-line text-[16px]" aria-hidden="true" />
                   Copy codes
                 </button>
                 <button
                   type="button"
                   onClick={finishSetup}
-                  className="px-4 py-2.5 rounded-[10px] bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white text-[13px] font-semibold"
+                  className="btn btn-primary"
                 >
-                  I've saved these — Done
+                  I’ve saved them
                 </button>
               </div>
             </div>
@@ -372,44 +370,47 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
         </section>
 
         {/* ================= SESSIONS CARD ================= */}
-        <section className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-6">
+        <section className="panel p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[17px] font-bold">💻 Active Sessions</h3>
+            <h2 className="flex items-center gap-2 text-base font-semibold tracking-tight">
+              <i className="ri-computer-line text-[20px] text-ink-soft" aria-hidden="true" />
+              Active sessions
+            </h2>
             {sessions.length > 1 && (
               <button
                 type="button"
                 onClick={revokeOthers}
                 disabled={revokingOthers}
-                className="text-[12px] font-semibold text-[#F87171] hover:underline disabled:opacity-50"
+                className="btn btn-secondary h-8 px-3 text-[13px] !text-danger"
               >
-                {revokingOthers ? "Logging out..." : "Log out all other devices"}
+                {revokingOthers ? "Logging out" : "Log out other devices"}
               </button>
             )}
           </div>
 
           {sessionsLoading ? (
             <div className="text-center py-8">
-              <div className="w-8 h-8 border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mx-auto" />
+              <div className="spinner w-8 h-8 mx-auto text-accent" />
             </div>
           ) : sessions.length === 0 ? (
-            <p className="text-[13px] text-[#A8A4BD]">No active sessions found.</p>
+            <p className="text-[13px] text-muted">No active sessions.</p>
           ) : (
             <div className="space-y-2">
               {sessions.map((s) => (
                 <div
                   key={s._id}
-                  className="flex items-center justify-between gap-3 bg-black/20 border border-white/10 rounded-[12px] px-4 py-3"
+                  className="flex items-center justify-between gap-3 bg-canvas border border-line rounded-lg px-4 py-3"
                 >
                   <div>
-                    <p className="text-[13px] font-semibold text-[#F5F3FF]">
+                    <p className="text-[13px] font-semibold text-ink">
                       {describeDevice(s.userAgent)}
                       {s.isCurrent && (
-                        <span className="ml-2 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-[#8B72FF]/15 text-[#C9BFFF] border border-[#8B72FF]/20">
+                        <span className="ml-2 rounded bg-accent-tint px-1.5 py-0.5 text-xs font-medium text-accent">
                           This device
                         </span>
                       )}
                     </p>
-                    <p className="text-[11px] text-[#A8A4BD] mt-0.5">
+                    <p className="text-xs text-muted mt-0.5">
                       Active {formatRelativeTime(s.lastActiveAt)}
                     </p>
                   </div>
@@ -418,9 +419,9 @@ export default function SecuritySettings({ token, twoFactorEnabled: initialEnabl
                       type="button"
                       onClick={() => revokeSession(s._id)}
                       disabled={revokingId === s._id}
-                      className="text-[12px] font-semibold text-[#F87171] hover:underline disabled:opacity-50 whitespace-nowrap"
+                      className="btn btn-secondary h-8 px-3 text-[13px] !text-danger"
                     >
-                      {revokingId === s._id ? "..." : "Log out"}
+                      {revokingId === s._id ? "Logging out" : "Log out"}
                     </button>
                   )}
                 </div>

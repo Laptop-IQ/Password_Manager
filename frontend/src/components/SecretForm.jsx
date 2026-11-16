@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -119,31 +120,37 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
     }
   };
 
+  useEscapeKey(handleCancel, !loading);
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto"
+      className="dialog-backdrop"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dialog-title"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !loading) handleCancel();
       }}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[480px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 my-auto"
+        className="dialog max-w-[480px]"
       >
-        <div className="p-6 border-b border-white/10">
-          <h3 className="text-[20px] font-bold text-[#F5F3FF]">
-            {isEditMode ? "Edit Secret" : "Add Secret / TPIN"}
+        <div className="flex items-start justify-between gap-4 border-b border-line p-6">
+          <div className="min-w-0">
+            <h3 id="dialog-title" className="text-lg font-semibold tracking-tight text-ink">
+            {isEditMode ? "Edit secret" : "Add secret"}
           </h3>
-          <p className="text-[13px] text-[#A8A4BD] mt-1">
+            <p className="text-[13px] text-muted mt-1">
             Use this for TPINs, UPI PINs, security answers, or any other sensitive code.
           </p>
+          </div>
+          <button type="button" onClick={handleCancel} aria-label="Close" className="icon-btn -mr-2 -mt-1 h-9 w-9 shrink-0 text-[22px]"><i className="ri-close-line" aria-hidden="true" /></button>
         </div>
 
         <div className="p-6 space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
+            <label className="block text-[13px] font-medium text-ink">
               Type
             </label>
             <select
@@ -151,7 +158,7 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               value={formData.secretType}
               onChange={handleChange}
               disabled={loading}
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+              className="field"
             >
               {SECRET_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -162,7 +169,7 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
+            <label className="block text-[13px] font-medium text-ink">
               Title
             </label>
             <input
@@ -171,12 +178,12 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. Zerodha TPIN"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+              className="field"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
+            <label className="block text-[13px] font-medium text-ink">
               Issuer / Provider (optional)
             </label>
             <input
@@ -185,12 +192,12 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. Zerodha, ICICI Bank"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+              className="field"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
+            <label className="block text-[13px] font-medium text-ink">
               Value
             </label>
             <div className="relative">
@@ -201,20 +208,20 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
                 onChange={handleChange}
                 disabled={loading}
                 placeholder={isEditMode ? "Leave unchanged to keep current value" : "Enter the PIN / code"}
-                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 pr-14 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+                className="field pr-14"
               />
               <button
                 type="button"
                 onClick={() => setShowValue((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#C9BFFF] font-medium"
+                className="icon-btn absolute right-1.5 top-1/2 h-7 w-7 -translate-y-1/2 text-[16px]"
               >
-                {showValue ? "Hide" : "Show"}
+                <i className={showValue ? "ri-eye-off-line" : "ri-eye-line"} aria-hidden="true" /><span className="sr-only">{showValue ? "Hide" : "Show"}</span>
               </button>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
+            <label className="block text-[13px] font-medium text-ink">
               Notes (optional)
             </label>
             <textarea
@@ -223,20 +230,20 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
               value={formData.notes}
               onChange={handleChange}
               disabled={loading}
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+              className="field resize-none h-auto py-2.5"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="block text-[13px] font-semibold text-[#F5F3FF]">Category</label>
+              <label className="block text-[13px] font-medium text-ink">Category</label>
               <input
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 disabled={loading}
                 placeholder="General"
-                className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]"
+                className="field"
               />
             </div>
             <div className="space-y-1.5 flex items-end">
@@ -244,36 +251,37 @@ export default function SecretForm({ onClose, onSaved, token, editSecret = null 
                 type="button"
                 onClick={() => setFormData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }))}
                 disabled={loading}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[10px] text-[13px] font-semibold border transition-colors ${
+                className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-semibold border transition-colors ${
                   formData.isFavorite
-                    ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
-                    : "bg-black/20 border-white/10 text-[#A8A4BD] hover:text-white"
+                    ? "bg-warn-tint border-warn/30 text-warn"
+                    : "bg-canvas border-line text-muted hover:text-ink"
                 }`}
               >
-                {formData.isFavorite ? "★" : "☆"} Favorite
+                <i className={`${formData.isFavorite ? "ri-star-fill" : "ri-star-line"} text-[16px]`} aria-hidden="true" />
+                Favorite
               </button>
             </div>
           </div>
         </div>
 
-        <div className="bg-black/20 border-t border-white/10 p-5 flex justify-end gap-3 rounded-b-[20px]">
+        <div className="bg-sunken/50 border-t border-line px-6 py-4 flex justify-end gap-2 rounded-b-[14px]">
           <button
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[10px] disabled:opacity-50"
+            className="btn btn-secondary"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
+            className="btn btn-primary"
           >
             {loading && (
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="spinner w-4 h-4" />
             )}
-            {isEditMode ? "Update Secret" : "Save Secret"}
+            {isEditMode ? "Save changes" : "Save secret"}
           </button>
         </div>
       </form>

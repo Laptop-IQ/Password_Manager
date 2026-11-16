@@ -150,24 +150,13 @@ function ScrollToTop() {
 function LoadingScreen() {
   return (
     <div
-      className="min-h-screen bg-[#0A0810] flex items-center justify-center"
+      className="flex min-h-dvh items-center justify-center bg-canvas"
       role="status"
       aria-live="polite"
     >
-      <div className="flex flex-col items-center">
-        <div
-          className="
-            w-10
-            h-10
-            rounded-full
-            border-2
-            border-white/10
-            border-t-[#8B72FF]
-            animate-spin
-          "
-        />
-
-        <p className="mt-4 text-sm text-slate-500">Loading...</p>
+      <div className="flex flex-col items-center gap-3 text-muted">
+        <span className="spinner h-6 w-6 text-accent" aria-hidden="true" />
+        <p className="text-sm">Unlocking your vault…</p>
       </div>
     </div>
   );
@@ -447,8 +436,8 @@ export default function App() {
   return (
     <>
       <ToastContainer
-        position="top-right"
-        autoClose={3000}
+        position="bottom-right"
+        autoClose={3500}
         newestOnTop
         closeOnClick
         pauseOnHover
@@ -456,7 +445,7 @@ export default function App() {
       />
       <ScrollToTop />
       <Navbar user={user} onLogout={handleLogout} />
-      <main className="pt-16">
+      <main className="pt-16 min-h-dvh">
         <Routes>
           {/* Home */}
           <Route

@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -286,8 +287,8 @@ export default function AddNewPassword({
     if (score >= 6) {
       return {
         text: "Strong",
-        color: "text-[#34D399]",
-        bar: "bg-[#34D399]",
+        color: "text-ok",
+        bar: "bg-ok",
         width: "w-full",
       };
     }
@@ -295,16 +296,16 @@ export default function AddNewPassword({
     if (score >= 4) {
       return {
         text: "Good",
-        color: "text-[#FBBF24]",
-        bar: "bg-[#FBBF24]",
+        color: "text-warn",
+        bar: "bg-warn",
         width: "w-3/4",
       };
     }
 
     return {
       text: "Weak",
-      color: "text-[#F87171]",
-      bar: "bg-[#F87171]",
+      color: "text-danger",
+      bar: "bg-danger",
       width: "w-1/3",
     };
   };
@@ -434,45 +435,41 @@ export default function AddNewPassword({
   // RENDER
   // ============================================================
 
+  useEscapeKey(handleCancel, !loading);
+
   return (
-    <div className="fixed inset-0 min-h-screen backdrop-blur-sm bg-[#000000]/50 flex items-center justify-center p-4 font-sans z-50">
-      <div className="bg-[#120F1B] w-full max-w-[850px] rounded-[20px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div
+      className="dialog-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="password-dialog-title"
+    >
+      <div className="dialog max-w-[850px] flex flex-col overflow-hidden">
         {/* ======================================================
             HEADER
         ====================================================== */}
 
-        <div className="p-8 pb-6 flex justify-between items-start border-b border-white/10 bg-[#120F1B] z-10">
+        <div className="px-6 py-5 sm:px-8 flex justify-between items-start border-b border-line bg-surface">
           <div>
-            <h1 className="text-[22px] font-semibold text-[#F5F3FF] leading-tight">
-              {isEditMode ? "Edit Password" : "Add New Password"}
+            <h1 id="password-dialog-title" className="text-xl font-semibold tracking-tight text-ink leading-tight">
+              {isEditMode ? "Edit password" : "Add password"}
             </h1>
 
-            <p className="text-[14px] text-[#A8A4BD] mt-1">
+            <p className="text-[14px] text-muted mt-1">
               {isEditMode
-                ? "Update your saved credential details"
-                : "Securely store a new credential"}
+                ? "Update the saved login details"
+                : "Stored encrypted. Only you can read it."}
             </p>
           </div>
 
           <button
             type="button"
-            className="text-[#A8A4BD] hover:text-[#F5F3FF] transition-colors cursor-pointer p-2 hover:bg-white/5 rounded-lg"
+            className="icon-btn h-9 w-9 text-[22px]"
             onClick={handleCancel}
             disabled={loading}
             aria-label="Close"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <i className="ri-close-line text-[24px]" aria-hidden="true" />
           </button>
         </div>
 
@@ -481,7 +478,7 @@ export default function AddNewPassword({
         ====================================================== */}
 
         <form onSubmit={handleSubmit} className="overflow-y-auto">
-          <div className="px-8 py-6 flex flex-col md:flex-row gap-8">
+          <div className="px-6 py-6 sm:px-8 flex flex-col md:flex-row gap-8">
             {/* ==================================================
                 LEFT
             ================================================== */}
@@ -491,14 +488,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#F5F3FF]"
+                  className="block text-[13px] font-medium text-ink"
                   htmlFor="websiteName"
                 >
-                  Website Name
+                  Website name
                 </label>
 
                 <input
-                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
+                  className="field"
                   placeholder="e.g. GitHub, Gmail, Netflix"
                   type="text"
                   id="websiteName"
@@ -514,32 +511,19 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#F5F3FF]"
+                  className="block text-[13px] font-medium text-ink"
                   htmlFor="url"
                 >
                   Website URL
                 </label>
 
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#A8A4BD]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                    </svg>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted">
+                    <i className="ri-link text-[16px]" aria-hidden="true" />
                   </div>
 
                   <input
-                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] pl-10 pr-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
+                    className="field pl-10 pr-4"
                     placeholder="https://github.com"
                     type="url"
                     id="url"
@@ -556,14 +540,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2">
                 <label
-                  className="block text-[13px] font-semibold text-[#F5F3FF]"
+                  className="block text-[13px] font-medium text-ink"
                   htmlFor="username"
                 >
                   Username or Email
                 </label>
 
                 <input
-                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
+                  className="field"
                   placeholder="developer@example.com"
                   type="text"
                   id="username"
@@ -580,22 +564,22 @@ export default function AddNewPassword({
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label
-                    className="block text-[13px] font-semibold text-[#F5F3FF]"
+                    className="block text-[13px] font-medium text-ink"
                     htmlFor="password"
                   >
                     Password
                   </label>
 
                   <span
-                    className={`text-[11px] font-bold tracking-wider ${strength.color}`}
+                    className={`text-[11px] font-medium ${strength.color}`}
                   >
-                    {strength.text.toUpperCase()}
+                    {strength.text}
                   </span>
                 </div>
 
                 <div className="relative">
                   <input
-                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] pl-4 pr-20 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD]"
+                    className="field pl-4 pr-20"
                     placeholder="Enter a secure password"
                     type={showPassword ? "text" : "password"}
                     id="password"
@@ -615,46 +599,14 @@ export default function AddNewPassword({
                       type="button"
                       onClick={handleCopyPassword}
                       disabled={loading || !formData.password}
-                      className="p-1.5 flex items-center text-[#A8A4BD] hover:text-[#F5F3FF] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer rounded-md hover:bg-[#15121F] transition-colors"
+                      className="icon-btn h-7 w-7 text-[16px]"
                       aria-label="Copy password"
                       title="Copy password"
                     >
                       {passwordCopied ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#34D399"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 6 9 17l-5-5" />
-                        </svg>
+                        <i className="ri-check-line text-[18px] text-ok" aria-hidden="true" />
                       ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <rect
-                            width="13"
-                            height="13"
-                            x="9"
-                            y="9"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
+                        <i className="ri-file-copy-line text-[18px]" aria-hidden="true" />
                       )}
                     </button>
 
@@ -663,44 +615,16 @@ export default function AddNewPassword({
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="p-1.5 flex items-center text-[#A8A4BD] hover:text-[#F5F3FF] cursor-pointer rounded-md hover:bg-[#15121F] transition-colors"
+                      className="icon-btn h-7 w-7 text-[16px]"
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
                       title={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </svg>
+                        <i className="ri-eye-line text-[18px]" aria-hidden="true" />
                       ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M3 3l18 18" />
-                          <path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c7 0 10 7 10 8s-3 8-10 8a10.5 10.5 0 0 1-3-.4" />
-                          <path d="M6.6 6.6C3.8 8.5 2 12 2 12s3 7 10 7" />
-                          <line x1="1" y1="1" x2="23" y2="23" />
-                        </svg>
+                        <i className="ri-eye-off-line text-[18px]" aria-hidden="true" />
                       )}
                     </button>
                   </div>
@@ -708,27 +632,29 @@ export default function AddNewPassword({
 
                 {/* Strength */}
 
-                <div className="h-1.5 bg-[#15121F] rounded-full overflow-hidden">
+                <div className="h-1.5 bg-sunken rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${strength.bar} ${strength.width} rounded-full transition-all`}
+                    className={`h-full ${strength.bar}  ${strength.width} rounded-full transition-all`}
                   />
                 </div>
 
                 {/* Breach check status */}
 
                 {breachStatus.checking ? (
-                  <p className="text-[11px] text-[#A8A4BD] flex items-center gap-1.5">
-                    <span className="w-3 h-3 border-2 border-[#A8A4BD]/30 border-t-[#A8A4BD] rounded-full animate-spin inline-block" />
-                    Checking against known data breaches...
+                  <p className="text-xs text-muted flex items-center gap-1.5">
+                    <span className="spinner w-3 h-3 inline-block" />
+                    Checking known data breaches…
                   </p>
                 ) : breachStatus.breachCount > 0 ? (
-                  <p className="text-[11px] text-[#F87171] font-medium flex items-center gap-1.5">
-                    ⚠️ Seen in {breachStatus.breachCount.toLocaleString()}{" "}
+                  <p className="text-xs text-danger font-medium flex items-start gap-1.5">
+                    <i className="ri-error-warning-line mt-px text-[14px]" aria-hidden="true" />
+                    Seen in {breachStatus.breachCount.toLocaleString()}{" "}
                     known data breaches — pick a different password.
                   </p>
                 ) : breachStatus.breachCount === 0 ? (
-                  <p className="text-[11px] text-[#34D399] font-medium flex items-center gap-1.5">
-                    ✓ Not found in known breaches.
+                  <p className="text-xs text-ok font-medium flex items-center gap-1.5">
+                    <i className="ri-shield-check-line text-[14px]" aria-hidden="true" />
+                    Not found in known breaches.
                   </p>
                 ) : null}
               </div>
@@ -737,14 +663,14 @@ export default function AddNewPassword({
 
               <div className="space-y-2 pb-4">
                 <label
-                  className="block text-[13px] font-semibold text-[#F5F3FF]"
+                  className="block text-[13px] font-medium text-ink"
                   htmlFor="notes"
                 >
                   Notes (optional)
                 </label>
 
                 <textarea
-                  className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-3 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF] transition-all placeholder:text-[#A8A4BD] resize-none"
+                  className="field resize-none h-auto py-2.5"
                   placeholder="Add security questions or recovery codes..."
                   id="notes"
                   name="notes"
@@ -757,9 +683,9 @@ export default function AddNewPassword({
 
               {/* Category, Tags & Favorite */}
 
-              <div className="grid grid-cols-2 gap-3 pb-4">
+              <div className="grid grid-cols-2 items-end gap-3 pb-4">
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-semibold text-[#F5F3FF]" htmlFor="category">
+                  <label className="block text-[13px] font-medium text-ink" htmlFor="category">
                     Category
                   </label>
                   <input
@@ -769,12 +695,12 @@ export default function AddNewPassword({
                     onChange={handleFormChange}
                     disabled={loading}
                     placeholder="General"
-                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF]"
+                    className="field"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-[13px] font-semibold text-[#F5F3FF]" htmlFor="tags">
-                    Tags (comma separated)
+                  <label className="block text-[13px] font-medium text-ink" htmlFor="tags">
+                    Tags
                   </label>
                   <input
                     id="tags"
@@ -782,8 +708,8 @@ export default function AddNewPassword({
                     value={formData.tags}
                     onChange={handleFormChange}
                     disabled={loading}
-                    placeholder="work, banking"
-                    className="w-full bg-[#1A1625] border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/20 focus:border-[#8B72FF]"
+                    placeholder="work, banking (comma separated)"
+                    className="field"
                   />
                 </div>
               </div>
@@ -793,13 +719,17 @@ export default function AddNewPassword({
                   type="button"
                   onClick={() => setFormData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }))}
                   disabled={loading}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-[13px] font-semibold border transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-semibold border transition-colors ${
                     formData.isFavorite
-                      ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
-                      : "bg-[#1A1625] border-white/10 text-[#A8A4BD] hover:text-white"
+                      ? "bg-warn-tint border-warn/30 text-warn"
+                      : "bg-surface border-line text-muted hover:text-ink"
                   }`}
                 >
-                  {formData.isFavorite ? "★" : "☆"} Mark as favorite
+                  <i
+                    className={`${formData.isFavorite ? "ri-star-fill" : "ri-star-line"} text-[16px]`}
+                    aria-hidden="true"
+                  />
+                  Mark as favorite
                 </button>
               </div>
             </div>
@@ -808,11 +738,9 @@ export default function AddNewPassword({
                 GENERATOR
             ================================================== */}
 
-            <div className="w-full md:w-[300px] bg-[#1A1625] border border-white/10 rounded-[16px] p-6 flex flex-col h-fit">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="text-[20px]">✨</span>
-
-                <h3 className="text-[14px] font-semibold text-[#F5F3FF]">
+            <div className="w-full md:w-[290px] bg-canvas border border-line rounded-xl p-5 flex flex-col h-fit md:shrink-0">
+              <div className="mb-4">
+                <h3 className="text-[14px] font-semibold text-ink">
                   Generator
                 </h3>
               </div>
@@ -821,35 +749,22 @@ export default function AddNewPassword({
                 type="button"
                 onClick={generatePassword}
                 disabled={loading}
-                className="w-full px-6 py-3 cursor-pointer flex items-center gap-2 justify-center bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-semibold rounded-[12px] shadow-sm transition-all"
+                className="btn btn-primary w-full"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
-                  <path d="M21 3v5h-5" />
-                </svg>
+                <i className="ri-refresh-line text-[16px]" aria-hidden="true" />
                 Generate
               </button>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-[11px] text-[#A8A4BD] leading-relaxed">
-                  <strong>Pro tip:</strong> Use at least 16 characters with
-                  uppercase, numbers, and symbols for maximum security.
+              <div className="mt-5 pt-5 border-t border-line">
+                <p className="text-xs text-muted leading-relaxed">
+                  <strong className="font-medium text-ink-soft">Tip:</strong> Use at least 16 characters with
+                  uppercase, numbers and symbols.
                 </p>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-[11px] text-[#A8A4BD] leading-relaxed">
-                  <strong>🛡️ Anti-scam reminder:</strong> Only enter
+              <div className="mt-5 pt-5 border-t border-line">
+                <p className="text-xs text-muted leading-relaxed">
+                  <strong className="font-medium text-ink-soft">Anti-scam reminder:</strong> Only enter
                   credentials on the site's real, verified URL. No legitimate
                   company will ever ask for your password by email, phone, or
                   text.
@@ -862,12 +777,12 @@ export default function AddNewPassword({
               FOOTER
           ==================================================== */}
 
-          <div className="bg-[#1A1625] border-t border-white/10 p-6 flex justify-end items-center gap-4">
+          <div className="bg-sunken/50 border-t border-line px-6 py-4 sm:px-8 flex justify-end items-center gap-3">
             <button
               type="button"
               onClick={handleCancel}
               disabled={loading}
-              className="px-5 py-2.5 cursor-pointer text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[12px] transition-colors disabled:opacity-50"
+              className="btn btn-secondary"
             >
               Cancel
             </button>
@@ -875,33 +790,19 @@ export default function AddNewPassword({
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 cursor-pointer bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[12px] flex items-center gap-2 shadow-sm transition-all"
+              className="btn btn-primary"
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="spinner w-4 h-4" />
 
-                  {isEditMode ? "Updating..." : "Saving..."}
+                  {isEditMode ? "Saving" : "Saving"}
                 </>
               ) : (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <i className="ri-lock-line text-[16px]" aria-hidden="true" />
 
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-
-                  {isEditMode ? "Update Securely" : "Save Securely"}
+                  {isEditMode ? "Save changes" : "Save password"}
                 </>
               )}
             </button>

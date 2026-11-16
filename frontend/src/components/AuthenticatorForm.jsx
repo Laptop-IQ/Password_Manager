@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -84,56 +85,62 @@ export default function AuthenticatorForm({ onClose, onSaved, token, editItem = 
     }
   };
 
+  useEscapeKey(handleCancel, !loading);
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-8 overflow-y-auto"
+      className="dialog-backdrop"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dialog-title"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !loading) handleCancel();
       }}
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[480px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 my-auto"
+        className="dialog max-w-[480px]"
       >
-        <div className="p-6 border-b border-white/10">
-          <h3 className="text-[20px] font-bold text-[#F5F3FF]">
-            {isEditMode ? "Edit Authenticator" : "Add Authenticator"}
+        <div className="flex items-start justify-between gap-4 border-b border-line p-6">
+          <div className="min-w-0">
+            <h3 id="dialog-title" className="text-lg font-semibold tracking-tight text-ink">
+            {isEditMode ? "Edit authenticator" : "Add authenticator"}
           </h3>
-          <p className="text-[13px] text-[#A8A4BD] mt-1">
-            Store a TOTP secret to generate 6-digit codes for another site's 2FA.
+            <p className="text-[13px] text-muted mt-1">
+            Store a TOTP secret to get 6-digit codes for another site’s two-factor login.
           </p>
+          </div>
+          <button type="button" onClick={handleCancel} aria-label="Close" className="icon-btn -mr-2 -mt-1 h-9 w-9 shrink-0 text-[22px]"><i className="ri-close-line" aria-hidden="true" /></button>
         </div>
 
         <div className="p-6 space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">Issuer / Service</label>
+            <label className="block text-[13px] font-medium text-ink">Issuer / Service</label>
             <input
               name="issuer"
               value={formData.issuer}
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. GitHub, Google"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+              className="field"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">Account (optional)</label>
+            <label className="block text-[13px] font-medium text-ink">Account (optional)</label>
             <input
               name="accountName"
               value={formData.accountName}
               onChange={handleChange}
               disabled={loading}
               placeholder="e.g. you@example.com"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+              className="field"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">
-              Secret key {isEditMode && <span className="text-[#A8A4BD] font-normal">(leave blank to keep current)</span>}
+            <label className="block text-[13px] font-medium text-ink">
+              Secret key {isEditMode && <span className="text-muted font-normal">(leave blank to keep current)</span>}
             </label>
             <input
               name="secret"
@@ -141,51 +148,51 @@ export default function AuthenticatorForm({ onClose, onSaved, token, editItem = 
               onChange={handleChange}
               disabled={loading}
               placeholder="Base32 secret from the site's QR setup"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] font-mono focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+              className="field font-mono"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">Category</label>
+            <label className="block text-[13px] font-medium text-ink">Category</label>
             <input
               name="category"
               value={formData.category}
               onChange={handleChange}
               disabled={loading}
               placeholder="General"
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+              className="field"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[13px] font-semibold text-[#F5F3FF]">Notes (optional)</label>
+            <label className="block text-[13px] font-medium text-ink">Notes (optional)</label>
             <textarea
               name="notes"
               rows={2}
               value={formData.notes}
               onChange={handleChange}
               disabled={loading}
-              className="w-full bg-black/20 border border-white/10 text-[#F5F3FF] text-[14px] px-4 py-2.5 rounded-[10px] resize-none focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25"
+              className="field resize-none h-auto py-2.5"
             />
           </div>
         </div>
 
-        <div className="bg-black/20 border-t border-white/10 p-5 flex justify-end gap-3 rounded-b-[20px]">
+        <div className="bg-sunken/50 border-t border-line px-6 py-4 flex justify-end gap-2 rounded-b-[14px]">
           <button
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-5 py-2.5 text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[10px] disabled:opacity-50"
+            className="btn btn-secondary"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2.5 bg-[#8B72FF] hover:bg-[#765be8] disabled:bg-[#4B4560] text-white text-[14px] font-medium rounded-[10px] flex items-center gap-2"
+            className="btn btn-primary"
           >
-            {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {isEditMode ? "Update" : "Save"}
+            {loading && <span className="spinner w-4 h-4" />}
+            {isEditMode ? "Save changes" : "Save"}
           </button>
         </div>
       </form>

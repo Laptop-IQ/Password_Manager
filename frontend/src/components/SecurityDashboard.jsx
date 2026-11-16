@@ -15,10 +15,10 @@ const API_URL = `${API_BASE}/api`;
 const getId = (item) => String(item?._id ?? item?.id ?? "");
 
 const strengthOf = (password = "") => {
-  if (password.length >= 16) return { label: "Strong", color: "#34D399" };
-  if (password.length >= 12) return { label: "Good", color: "#8B72FF" };
-  if (password.length >= 8) return { label: "Fair", color: "#FBBF24" };
-  return { label: "Weak", color: "#F87171" };
+  if (password.length >= 16) return { label: "Strong", color: "#17734a" };
+  if (password.length >= 12) return { label: "Good", color: "#2f4fb8" };
+  if (password.length >= 8) return { label: "Fair", color: "#96590a" };
+  return { label: "Weak", color: "#b42318" };
 };
 
 export default function SecurityDashboard({ token }) {
@@ -86,7 +86,7 @@ export default function SecurityDashboard({ token }) {
     return score;
   }, [passwords.length, weakItems.length, duplicateIds.size, breachedItems.length]);
 
-  const scoreColor = overallScore >= 80 ? "#34D399" : overallScore >= 50 ? "#FBBF24" : "#F87171";
+  const scoreColor = overallScore >= 80 ? "#17734a" : overallScore >= 50 ? "#96590a" : "#b42318";
 
   // ============================================================
   // BREACH CHECK
@@ -120,78 +120,99 @@ export default function SecurityDashboard({ token }) {
     }
   };
 
-  return (
-    <div className="relative min-h-screen bg-[#0A0810] font-['Inter',sans-serif] text-[#F5F3FF]">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 h-[420px] w-[420px] rounded-full bg-[#8B72FF]/20 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-[#F87171]/10 blur-[120px]" />
-      </div>
+  const scoreLabel =
+    overallScore >= 80 ? "Healthy" : overallScore >= 50 ? "Needs attention" : "At risk";
 
-      <main className="relative max-w-[900px] mx-auto px-[20px] md:px-[32px] pt-[56px] pb-[100px]">
+  const SectionTitle = ({ icon, tone, children }) => (
+    <h2 className={`mb-3 flex items-center gap-2 text-[15px] font-semibold tracking-tight ${tone}`}>
+      <i className={`${icon} text-[18px]`} aria-hidden="true" />
+      {children}
+    </h2>
+  );
+
+  return (
+    <div className="min-h-dvh bg-canvas text-ink">
+      <main className="mx-auto max-w-[900px] px-4 pb-24 pt-10 sm:px-8">
         <div className="mb-8">
-          <h2 className="text-[32px] font-extrabold font-['Manrope',sans-serif] bg-gradient-to-r from-white to-[#C9BFFF] bg-clip-text text-transparent">
-            Security Dashboard
-          </h2>
-          <p className="text-[15px] text-[#A8A4BD] mt-1">
-            Weak, reused, and breached password detection across your vault.
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
+            Security audit
+          </h1>
+          <p className="mt-1 text-sm text-muted">
+            Weak, reused and breached passwords across your vault.
           </p>
         </div>
 
         {loading ? (
-          <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-            <div className="w-10 h-10 border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-[15px] text-[#A8A4BD]">Analyzing your vault...</p>
+          <div className="panel flex items-center justify-center gap-3 p-12 text-muted" role="status">
+            <span className="spinner text-accent" aria-hidden="true" />
+            <p className="text-sm">Analyzing your vault…</p>
           </div>
         ) : passwords.length === 0 ? (
-          <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-            <p className="text-[15px] text-[#A8A4BD]">Add some passwords first to run a security audit.</p>
+          <div className="panel px-6 py-16 text-center">
+            <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-xl bg-sunken text-ink-soft">
+              <i className="ri-radar-line text-[24px]" aria-hidden="true" />
+            </div>
+            <p className="text-lg font-semibold tracking-tight">Nothing to audit yet</p>
+            <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted">
+              Save a few passwords first, then come back to check how strong they are.
+            </p>
           </div>
         ) : (
           <>
             {/* SCORE + SUMMARY */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[16px] border border-white/10 p-4 text-center">
-                <p className="text-[28px] font-extrabold" style={{ color: scoreColor }}>
-                  {overallScore}
+            <div className="panel mb-6 grid grid-cols-2 divide-line sm:grid-cols-4 sm:divide-x">
+              <div className="col-span-2 border-b border-line p-5 sm:col-span-1 sm:border-b-0">
+                <p className="text-xs text-muted">Vault score</p>
+                <p className="mt-1 flex items-baseline gap-1.5">
+                  <span className="text-[34px] font-semibold leading-none tabular-nums" style={{ color: scoreColor }}>
+                    {overallScore}
+                  </span>
+                  <span className="text-sm text-muted">/ 100</span>
                 </p>
-                <p className="text-[11px] text-[#A8A4BD] uppercase tracking-wide mt-1">Score</p>
+                <p className="mt-1 text-xs font-medium" style={{ color: scoreColor }}>{scoreLabel}</p>
               </div>
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[16px] border border-white/10 p-4 text-center">
-                <p className="text-[28px] font-extrabold text-[#F87171]">{weakItems.length}</p>
-                <p className="text-[11px] text-[#A8A4BD] uppercase tracking-wide mt-1">Weak</p>
+              <div className="p-5">
+                <p className="text-xs text-muted">Weak</p>
+                <p className="mt-1 text-2xl font-semibold tabular-nums text-ink">{weakItems.length}</p>
               </div>
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[16px] border border-white/10 p-4 text-center">
-                <p className="text-[28px] font-extrabold text-[#FBBF24]">{duplicateIds.size}</p>
-                <p className="text-[11px] text-[#A8A4BD] uppercase tracking-wide mt-1">Reused</p>
+              <div className="p-5">
+                <p className="text-xs text-muted">Reused</p>
+                <p className="mt-1 text-2xl font-semibold tabular-nums text-ink">{duplicateIds.size}</p>
               </div>
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[16px] border border-white/10 p-4 text-center">
-                <p className="text-[28px] font-extrabold text-[#F87171]">
-                  {breachRun ? breachedItems.length : "?"}
+              <div className="p-5">
+                <p className="text-xs text-muted">Breached</p>
+                <p className="mt-1 text-2xl font-semibold tabular-nums text-ink">
+                  {breachRun ? breachedItems.length : "Not run"}
                 </p>
-                <p className="text-[11px] text-[#A8A4BD] uppercase tracking-wide mt-1">Breached</p>
               </div>
             </div>
 
             {/* BREACH CHECK CTA */}
             {!breachRun && (
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[16px] border border-white/10 p-5 mb-8 flex items-center justify-between gap-4 flex-wrap">
-                <div>
-                  <p className="text-[14px] font-semibold text-[#F5F3FF]">
-                    🌐 Check against known data breaches
-                  </p>
-                  <p className="text-[12px] text-[#A8A4BD] mt-1">
-                    Uses Have I Been Pwned's k-anonymity API — your passwords never leave your browser in full.
+              <div className="panel mb-8 flex flex-wrap items-center justify-between gap-4 p-5">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ink">Check against known data breaches</p>
+                  <p className="mt-1 max-w-[520px] text-[13px] text-muted">
+                    Uses the Have I Been Pwned range API. Only a short hash prefix is sent, never the full password.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={runBreachCheck}
                   disabled={breachChecking}
-                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[13px] font-semibold disabled:opacity-60 transition-all whitespace-nowrap"
+                  className="btn btn-primary"
                 >
-                  {breachChecking
-                    ? `Checking... ${breachProgress.done}/${breachProgress.total}`
-                    : "Run breach check"}
+                  {breachChecking ? (
+                    <>
+                      <span className="spinner" aria-hidden="true" />
+                      Checking {breachProgress.done}/{breachProgress.total}
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-search-eye-line text-[16px]" aria-hidden="true" />
+                      Run breach check
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -199,80 +220,92 @@ export default function SecurityDashboard({ token }) {
             {/* WEAK PASSWORDS */}
             {weakItems.length > 0 && (
               <section className="mb-8">
-                <h3 className="text-[15px] font-bold mb-3 text-[#F87171]">⚠️ Weak passwords ({weakItems.length})</h3>
-                <div className="space-y-2">
-                  {weakItems.map((p) => (
-                    <div key={getId(p)} className="flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-4 py-3">
-                      <div>
-                        <p className="text-[13px] font-semibold text-[#F5F3FF]">{p.websiteName}</p>
-                        <p className="text-[11px] text-[#A8A4BD]">{p.username || "—"}</p>
-                      </div>
-                      <span
-                        className="text-[10px] font-bold uppercase px-2 py-1 rounded-full"
-                        style={{ color: strengthOf(p.password).color, backgroundColor: `${strengthOf(p.password).color}20` }}
-                      >
-                        {strengthOf(p.password).label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <SectionTitle icon="ri-error-warning-line" tone="text-danger">
+                  Weak passwords ({weakItems.length})
+                </SectionTitle>
+                <ul className="panel divide-y divide-line">
+                  {weakItems.map((p) => {
+                    const st = strengthOf(p.password);
+                    return (
+                      <li key={getId(p)} className="flex items-center justify-between gap-3 px-4 py-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-ink">{p.websiteName}</p>
+                          <p className="truncate text-xs text-muted">{p.username || "—"}</p>
+                        </div>
+                        <span
+                          className="shrink-0 rounded px-1.5 py-0.5 text-xs font-medium"
+                          style={{ color: st.color, backgroundColor: `${st.color}1a` }}
+                        >
+                          {st.label}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </section>
             )}
 
             {/* DUPLICATE PASSWORDS */}
             {duplicateGroups.length > 0 && (
               <section className="mb-8">
-                <h3 className="text-[15px] font-bold mb-3 text-[#FBBF24]">
-                  ♻️ Reused passwords ({duplicateGroups.length} group{duplicateGroups.length > 1 ? "s" : ""})
-                </h3>
-                <div className="space-y-3">
+                <SectionTitle icon="ri-file-copy-2-line" tone="text-warn">
+                  Reused passwords ({duplicateGroups.length} group{duplicateGroups.length > 1 ? "s" : ""})
+                </SectionTitle>
+                <ul className="space-y-3">
                   {duplicateGroups.map((group, i) => (
-                    <div key={i} className="bg-black/20 border border-white/10 rounded-[12px] px-4 py-3">
-                      <p className="text-[11px] text-[#A8A4BD] mb-2">
-                        Same password used on {group.length} accounts:
+                    <li key={i} className="panel px-4 py-3">
+                      <p className="mb-2 text-xs text-muted">
+                        Same password on {group.length} accounts
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {group.map((p) => (
-                          <span key={getId(p)} className="text-[12px] font-semibold text-[#F5F3FF] bg-[#FBBF24]/10 border border-[#FBBF24]/20 px-2.5 py-1 rounded-full">
+                          <span
+                            key={getId(p)}
+                            className="rounded-md bg-warn-tint px-2 py-1 text-[13px] font-medium text-ink"
+                          >
                             {p.websiteName}
                           </span>
                         ))}
                       </div>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </section>
             )}
 
             {/* BREACHED PASSWORDS */}
             {breachRun && breachedItems.length > 0 && (
               <section className="mb-8">
-                <h3 className="text-[15px] font-bold mb-3 text-[#F87171]">
-                  🚨 Found in data breaches ({breachedItems.length})
-                </h3>
-                <div className="space-y-2">
+                <SectionTitle icon="ri-spam-2-line" tone="text-danger">
+                  Found in data breaches ({breachedItems.length})
+                </SectionTitle>
+                <ul className="divide-y divide-danger/15 overflow-hidden rounded-xl border border-danger/25 bg-danger-tint">
                   {breachedItems.map((p) => (
-                    <div key={getId(p)} className="flex items-center justify-between bg-[#3F1013] border border-[#F87171]/20 rounded-[12px] px-4 py-3">
-                      <div>
-                        <p className="text-[13px] font-semibold text-[#F5F3FF]">{p.websiteName}</p>
-                        <p className="text-[11px] text-[#A8A4BD]">{p.username || "—"}</p>
+                    <li key={getId(p)} className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-ink">{p.websiteName}</p>
+                        <p className="truncate text-xs text-ink-soft">{p.username || "—"}</p>
                       </div>
-                      <span className="text-[11px] font-semibold text-[#F87171]">
-                        Seen {breachResults[getId(p)]?.count?.toLocaleString() || "many"}× in breaches
+                      <span className="shrink-0 text-xs font-medium text-danger">
+                        Seen {breachResults[getId(p)]?.count?.toLocaleString() || "many"} times
                       </span>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </section>
             )}
 
-            {weakItems.length === 0 && duplicateGroups.length === 0 && breachRun && breachedItems.length === 0 && (
-              <div className="bg-[#0B2E21] border border-[#34D399]/20 rounded-[16px] p-6 text-center">
-                <p className="text-[15px] font-semibold text-[#34D399]">
-                  ✅ Great job — no weak, reused, or breached passwords found.
-                </p>
-              </div>
-            )}
+            {weakItems.length === 0 &&
+              duplicateGroups.length === 0 &&
+              breachRun &&
+              breachedItems.length === 0 && (
+                <div className="flex items-center gap-3 rounded-xl border border-ok/25 bg-ok-tint p-5">
+                  <i className="ri-shield-check-line text-[22px] text-ok" aria-hidden="true" />
+                  <p className="text-sm font-medium text-ok">
+                    No weak, reused or breached passwords found.
+                  </p>
+                </div>
+              )}
           </>
         )}
       </main>

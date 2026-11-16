@@ -1,13 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  AlertCircle,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Loader2,
-  MailCheck,
-} from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 /* =========================================================
@@ -496,66 +488,13 @@ const VerifyOtp = () => {
   ======================================================= */
 
   return (
-    <main
-      className="
-        relative
-        flex
-        min-h-[100dvh]
-        w-full
-        items-center
-        justify-center
-        overflow-hidden
-        bg-gradient-to-br
-        from-[#f8f7ff]
-        via-white
-        to-[#f3f0ff]
-        px-4
-        py-6
-        sm:px-6
-        sm:py-8
-      "
+    <div
+      className="flex min-h-[calc(100dvh-4rem)] w-full items-center justify-center px-4 py-10 sm:px-6"
     >
-      {/* =====================================================
-          BACKGROUND GLOW
-      ====================================================== */}
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -right-28
-          -top-28
-          h-72
-          w-72
-          rounded-full
-          bg-purple-300/20
-          blur-3xl
-          sm:-right-36
-          sm:-top-36
-          sm:h-96
-          sm:w-96
-        "
-      />
+      
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -bottom-28
-          -left-28
-          h-72
-          w-72
-          rounded-full
-          bg-blue-300/15
-          blur-3xl
-          sm:-bottom-36
-          sm:-left-36
-          sm:h-96
-          sm:w-96
-        "
-      />
+      
 
       {/* =====================================================
           CARD WRAPPER
@@ -564,95 +503,21 @@ const VerifyOtp = () => {
       <section className="relative w-full max-w-[410px]">
         {/* Gradient border */}
 
-        <div
-          aria-hidden="true"
-          className="
-            pointer-events-none
-            absolute
-            -inset-[1px]
-            rounded-[25px]
-            bg-gradient-to-r
-            from-[#7c3aed]
-            via-[#c026d3]
-            to-[#3b82f6]
-            opacity-75
-          "
-        />
+        
 
         {/* =================================================
             CARD
         ================================================== */}
 
         <div
-          className="
-            relative
-            w-full
-            overflow-hidden
-            rounded-[24px]
-            border
-            border-white
-            bg-white
-            px-6
-            py-7
-            shadow-[0_20px_55px_rgba(76,29,149,0.14)]
-            sm:px-9
-            sm:py-8
-          "
+          className="relative w-full rounded-xl border border-line bg-surface px-6 py-8 shadow-panel sm:px-9 sm:py-9"
         >
           {/* Inner glow */}
 
-          <div
-            aria-hidden="true"
-            className="
-              pointer-events-none
-              absolute
-              -right-20
-              -top-20
-              h-44
-              w-44
-              rounded-full
-              bg-purple-200/15
-              blur-3xl
-            "
-          />
+          
 
-          {/* =================================================
-              SMALL DOT PATTERN
-              
-              IMPORTANT:
-              Dots are INSIDE card and positioned
-              away from heading.
-          ================================================== */}
 
-          <div
-            aria-hidden="true"
-            className="
-              pointer-events-none
-              absolute
-              right-5
-              top-5
-              z-10
-              grid
-              grid-cols-5
-              gap-[4px]
-              opacity-25
-            "
-          >
-            {Array.from({
-              length: 25,
-            }).map((_, index) => (
-              <span
-                key={index}
-                className="
-                  block
-                  h-[2px]
-                  w-[2px]
-                  rounded-full
-                  bg-[#7c3aed]
-                "
-              />
-            ))}
-          </div>
+          
 
           {/* =================================================
               HEADER
@@ -673,105 +538,36 @@ const VerifyOtp = () => {
               onClick={handleBack}
               disabled={isLoading || isResending}
               aria-label="Back to signup"
-              className="
-                absolute
-                left-0
-                top-0
-                flex
-                h-8
-                w-8
-                items-center
-                justify-center
-                rounded-lg
-                text-gray-400
-                transition-all
-                duration-200
-                hover:bg-purple-50
-                hover:text-purple-600
-                focus:outline-none
-                focus:ring-2
-                focus:ring-purple-500/30
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+              className="icon-btn absolute left-0 top-0"
             >
-              <ArrowLeft size={17} aria-hidden="true" />
+              <i className="ri-arrow-left-line text-[17px]" aria-hidden="true" />
             </button>
 
             {/* Icon */}
 
             <div
-              className="
-                mx-auto
-                mb-3
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-[14px]
-                bg-gradient-to-br
-                from-[#7c3aed]
-                to-[#3b82f6]
-                shadow-lg
-                shadow-purple-500/20
-              "
+              className="mx-auto mb-4 grid h-11 w-11 place-items-center rounded-xl bg-primary text-white"
             >
-              <MailCheck size={24} className="text-white" aria-hidden="true" />
+              <i className="ri-mail-check-line text-[24px] text-ink" aria-hidden="true" />
             </div>
 
             {/* Title */}
 
             <h1
-              className="
-                whitespace-nowrap
-                px-7
-                text-[26px]
-                font-extrabold
-                leading-tight
-                tracking-[-0.03em]
-                text-transparent
-                bg-gradient-to-r
-                from-[#7c3aed]
-                via-[#c026d3]
-                to-[#3b82f6]
-                bg-clip-text
-                sm:text-[30px]
-              "
+              className="text-2xl font-semibold tracking-tight text-ink"
             >
               Verify Your Account
             </h1>
 
             <p
-              className="
-                mx-auto
-                mt-2
-                max-w-[310px]
-                px-2
-                text-[12px]
-                leading-5
-                text-gray-500
-                sm:text-[13px]
-              "
+              className="mx-auto mt-2 max-w-[310px] px-2 text-[12px] leading-5 text-muted sm:text-[13px]"
             >
               Enter the 6-digit verification code sent to your email
             </p>
 
             {/* Gradient underline */}
 
-            <div
-              aria-hidden="true"
-              className="
-                mx-auto
-                mt-3
-                h-[3px]
-                w-12
-                rounded-full
-                bg-gradient-to-r
-                from-[#7c3aed]
-                to-[#3b82f6]
-              "
-            />
+            
           </header>
 
           {/* =================================================
@@ -779,46 +575,16 @@ const VerifyOtp = () => {
           ================================================== */}
 
           <div
-            className="
-              relative
-              z-20
-              mb-6
-              flex
-              w-full
-              min-w-0
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              border
-              border-purple-100
-              bg-purple-50/60
-              px-3
-              py-3
-            "
+            className="relative z-20 mb-6 flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-line bg-sunken/60 px-3 py-3"
           >
-            <MailCheck
-              size={16}
-              className="
-                shrink-0
-                text-purple-500
-              "
-              aria-hidden="true"
-            />
+            <i className="ri-mail-check-line text-[16px] shrink-0 text-accent" aria-hidden="true" />
 
             <p
-              className="
-                min-w-0
-                truncate
-                text-center
-                text-[11px]
-                text-gray-600
-                sm:text-xs
-              "
+              className="min-w-0 truncate text-center text-[11px] text-ink-soft sm:text-xs"
               title={email}
             >
               Code sent to{" "}
-              <strong className="font-semibold text-gray-800">
+              <strong className="font-semibold text-ink">
                 {maskedEmail}
               </strong>
             </p>
@@ -832,34 +598,9 @@ const VerifyOtp = () => {
             <div
               role="alert"
               aria-live="polite"
-              className="
-                relative
-                z-20
-                mb-5
-                flex
-                w-full
-                min-w-0
-                items-start
-                gap-2.5
-                rounded-lg
-                border
-                border-red-200
-                bg-red-50
-                px-3
-                py-2.5
-                text-xs
-                text-red-600
-              "
+              className="relative z-20 mb-5 flex w-full min-w-0 items-start gap-2.5 rounded-lg border border-danger/25 bg-danger-tint px-3 py-2.5 text-xs text-danger"
             >
-              <AlertCircle
-                size={17}
-                className="
-                  mt-0.5
-                  shrink-0
-                  text-red-500
-                "
-                aria-hidden="true"
-              />
+              <i className="ri-error-warning-line text-[17px] mt-0.5 shrink-0 text-danger" aria-hidden="true" />
 
               <span className="min-w-0 break-words leading-5">{error}</span>
             </div>
@@ -873,34 +614,9 @@ const VerifyOtp = () => {
             <div
               role="status"
               aria-live="polite"
-              className="
-                relative
-                z-20
-                mb-5
-                flex
-                w-full
-                min-w-0
-                items-start
-                gap-2.5
-                rounded-lg
-                border
-                border-green-200
-                bg-green-50
-                px-3
-                py-2.5
-                text-xs
-                text-green-600
-              "
+              className="relative z-20 mb-5 flex w-full min-w-0 items-start gap-2.5 rounded-lg border border-ok/25 bg-ok-tint px-3 py-2.5 text-xs text-ok"
             >
-              <CheckCircle2
-                size={17}
-                className="
-                  mt-0.5
-                  shrink-0
-                  text-green-500
-                "
-                aria-hidden="true"
-              />
+              <i className="ri-checkbox-circle-line text-[17px] mt-0.5 shrink-0 text-ok" aria-hidden="true" />
 
               <span className="min-w-0 break-words leading-5">
                 {resendMessage}
@@ -920,14 +636,7 @@ const VerifyOtp = () => {
             {/* OTP Label */}
 
             <label
-              className="
-                mb-3
-                block
-                text-center
-                text-[13px]
-                font-semibold
-                text-gray-700
-              "
+              className="mb-3 block text-center text-[13px] font-semibold text-ink-soft"
             >
               Verification Code
             </label>
@@ -965,33 +674,7 @@ const VerifyOtp = () => {
                   onChange={(event) => handleChange(event, index)}
                   onKeyDown={(event) => handleKeyDown(event, index)}
                   onPaste={(event) => handlePaste(event, index)}
-                  className="
-                    box-border
-                    h-[48px]
-                    w-[42px]
-                    min-w-0
-                    rounded-[10px]
-                    border
-                    border-gray-200
-                    bg-white
-                    text-center
-                    text-[19px]
-                    font-bold
-                    text-gray-800
-                    outline-none
-                    transition-all
-                    duration-200
-                    hover:border-purple-200
-                    focus:border-purple-500
-                    focus:ring-4
-                    focus:ring-purple-500/10
-                    disabled:cursor-not-allowed
-                    disabled:bg-gray-50
-                    disabled:opacity-60
-                    sm:h-[52px]
-                    sm:w-[46px]
-                    sm:rounded-xl
-                  "
+                  className="field h-12 w-[42px] px-0 text-center text-lg font-semibold"
                 />
               ))}
             </div>
@@ -1003,69 +686,15 @@ const VerifyOtp = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="
-                group
-                relative
-                flex
-                h-[48px]
-                w-full
-                items-center
-                justify-center
-                gap-2
-                overflow-hidden
-                rounded-[10px]
-                bg-gradient-to-r
-                from-[#7c3aed]
-                via-[#c026d3]
-                to-[#3b82f6]
-                px-4
-                text-[13px]
-                font-bold
-                text-white
-                shadow-md
-                shadow-purple-500/20
-                transition-all
-                duration-300
-                hover:-translate-y-[1px]
-                hover:shadow-lg
-                hover:shadow-purple-500/25
-                focus:outline-none
-                focus:ring-4
-                focus:ring-purple-500/20
-                disabled:cursor-not-allowed
-                disabled:translate-y-0
-                disabled:opacity-60
-              "
+              className="btn btn-primary h-11 w-full"
             >
               {/* Button shine */}
 
-              <span
-                aria-hidden="true"
-                className="
-                  absolute
-                  inset-0
-                  -translate-x-full
-                  bg-gradient-to-r
-                  from-transparent
-                  via-white/20
-                  to-transparent
-                  transition-transform
-                  duration-700
-                  group-hover:translate-x-full
-                "
-              />
+              
 
               {isLoading ? (
                 <>
-                  <Loader2
-                    size={17}
-                    className="
-                      relative
-                      z-10
-                      animate-spin
-                    "
-                    aria-hidden="true"
-                  />
+                  <span className="spinner relative z-10" aria-hidden="true" />
 
                   <span className="relative z-10">Verifying...</span>
                 </>
@@ -1073,17 +702,7 @@ const VerifyOtp = () => {
                 <>
                   <span className="relative z-10">Verify OTP</span>
 
-                  <ArrowRight
-                    size={17}
-                    className="
-                      relative
-                      z-10
-                      transition-transform
-                      duration-300
-                      group-hover:translate-x-1
-                    "
-                    aria-hidden="true"
-                  />
+                  <i className="ri-arrow-right-line text-[17px]" aria-hidden="true" />
                 </>
               )}
             </button>
@@ -1107,11 +726,7 @@ const VerifyOtp = () => {
             "
           >
             <span
-              className="
-                text-[11px]
-                text-gray-500
-                sm:text-xs
-              "
+              className="text-[11px] text-muted sm:text-xs"
             >
               Didn't receive the code?
             </span>
@@ -1120,33 +735,11 @@ const VerifyOtp = () => {
               type="button"
               onClick={handleResend}
               disabled={resendTimer > 0 || isResending || isLoading}
-              className="
-                inline-flex
-                items-center
-                gap-1
-                rounded
-                text-[11px]
-                font-bold
-                text-purple-600
-                transition-colors
-                hover:text-blue-600
-                hover:underline
-                focus:outline-none
-                focus:ring-2
-                focus:ring-purple-500/30
-                disabled:cursor-not-allowed
-                disabled:text-gray-400
-                disabled:no-underline
-                sm:text-xs
-              "
+              className="inline-flex items-center gap-1 rounded text-[11px] font-medium text-accent transition-colors hover:text-accent-hover hover:underline focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:cursor-not-allowed disabled:text-faint disabled:no-underline sm:text-xs"
             >
               {isResending ? (
                 <>
-                  <Loader2
-                    size={12}
-                    className="animate-spin"
-                    aria-hidden="true"
-                  />
+                  <span className="spinner" aria-hidden="true" />
                   Sending...
                 </>
               ) : resendTimer > 0 ? (
@@ -1173,24 +766,14 @@ const VerifyOtp = () => {
               type="button"
               onClick={handleBack}
               disabled={isLoading || isResending}
-              className="
-                text-[11px]
-                font-medium
-                text-gray-400
-                transition-colors
-                hover:text-purple-600
-                focus:outline-none
-                focus:underline
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+              className="text-[11px] font-medium text-faint transition-colors hover:text-accent focus:outline-none focus:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
-              ← Use a different email
+              Use a different email
             </button>
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

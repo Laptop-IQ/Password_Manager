@@ -1,80 +1,173 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+
+const NAV_ITEMS = [
+  { to: "/", label: "Passwords", icon: "ri-key-2-line", end: true },
+  { to: "/vault", label: "Cards & secrets", icon: "ri-bank-card-line" },
+  { to: "/security", label: "Security", icon: "ri-shield-keyhole-line", end: true },
+  { to: "/security/audit", label: "Audit", icon: "ri-radar-line" },
+];
+
+const linkClass = ({ isActive }) =>
+  `flex items-center gap-2 rounded-md px-3 h-9 text-sm font-medium transition-colors ${
+    isActive
+      ? "bg-sunken text-ink"
+      : "text-muted hover:bg-sunken/70 hover:text-ink"
+  }`;
 
 export default function Navbar({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
+    const onClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onClick);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onClick);
+    };
+  }, [menuOpen]);
 
   const handleLogout = () => {
     onLogout();
     navigate("/login");
   };
 
+  const displayName = user?.name || user?.email || "";
+  const initial = displayName.trim().charAt(0).toUpperCase();
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0A0810]/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        {/* Logo */}
+    <header
+      ref={menuRef}
+      className="fixed inset-x-0 top-0 z-50 border-b border-line bg-canvas/95 backdrop-blur-sm print:hidden"
+    >
+      <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-4 sm:px-8">
         <Link
           to="/"
-          className="text-xl font-bold tracking-tight text-white"
+          className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-md text-[15px] font-semibold tracking-tight text-ink"
         >
-          Password <span className="text-[#8B72FF]">Vault</span>
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-white">
+            <i className="ri-lock-2-fill text-[16px]" aria-hidden="true" />
+          </span>
+          Password Vault
         </Link>
 
-        {/* Navigation */}
-        <div className="flex items-center gap-3">
-          {user ? (
-            <>
-              <Link
-                to="/vault"
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
-              >
-                Cards &amp; Secrets
-              </Link>
+        {user ? (
+          <>
+            <nav
+              aria-label="Main"
+              className="hidden items-center gap-1 md:flex"
+            >
+              {NAV_ITEMS.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={linkClass}
+                >
+                  <i className={`${item.icon} text-[16px]`} aria-hidden="true" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
 
-              <Link
-                to="/security"
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
-              >
-                Security
-              </Link>
-
-              <Link
-                to="/security/audit"
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
-              >
-                Audit
-              </Link>
-
-              <span className="hidden text-sm text-slate-300 sm:block">
-                {user.name || user.email}
-              </span>
-
+            <div className="ml-auto hidden items-center gap-3 md:flex">
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="grid h-8 w-8 place-items-center rounded-full bg-accent-tint text-[13px] font-semibold text-accent"
+                  aria-hidden="true"
+                >
+                  {initial || <i className="ri-user-line" />}
+                </span>
+                <span className="max-w-[180px] truncate text-sm text-ink-soft">
+                  {displayName}
+                </span>
+              </div>
               <button
+                type="button"
                 onClick={handleLogout}
-                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10"
+                className="btn btn-secondary h-9 px-3"
               >
-                Logout
+                <i className="ri-logout-box-r-line text-[16px]" aria-hidden="true" />
+                Log out
               </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition hover:text-white"
-              >
-                Login
-              </Link>
+            </div>
 
-              <Link
-                to="/signup"
-                className="rounded-lg bg-[#8B72FF] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#765be8]"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
+            <button
+              type="button"
+              className="icon-btn ml-auto h-10 w-10 text-[22px] md:hidden"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setMenuOpen((v) => !v)}
+            >
+              <i
+                className={menuOpen ? "ri-close-line" : "ri-menu-line"}
+                aria-hidden="true"
+              />
+            </button>
+          </>
+        ) : (
+          <div className="ml-auto flex items-center gap-2">
+            <Link to="/login" className="btn btn-ghost h-9 px-3">
+              Log in
+            </Link>
+            <Link to="/signup" className="btn btn-primary h-9 px-3">
+              Create account
+            </Link>
+          </div>
+        )}
       </div>
-    </nav>
+
+      {user && menuOpen && (
+        <div
+          id="mobile-menu"
+          className="border-t border-line bg-canvas px-4 pb-4 pt-2 shadow-pop md:hidden"
+        >
+          <nav aria-label="Mobile" className="flex flex-col gap-1">
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={(s) => `${linkClass(s)} h-11`}
+              >
+                <i className={`${item.icon} text-[18px]`} aria-hidden="true" />
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
+            <span className="min-w-0 truncate text-sm text-ink-soft">
+              {displayName}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn btn-secondary h-9 px-3"
+            >
+              <i className="ri-logout-box-r-line text-[16px]" aria-hidden="true" />
+              Log out
+            </button>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }

@@ -5,6 +5,7 @@ import CardForm from "./CardForm";
 import SecretForm, { SECRET_TYPES } from "./SecretForm";
 import AuthenticatorForm from "./AuthenticatorForm";
 import { generateTotpCode, secondsRemainingInPeriod } from "../utils/totp";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -49,26 +50,27 @@ function TotpCodeDisplay({ secret }) {
   const pct = (secondsLeft / 30) * 100;
 
   return (
-    <div className="flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
-      <span className="font-mono text-[20px] tracking-[0.15em] text-[#F5F3FF]">
+    <div className="flex items-center justify-between rounded-lg border border-line bg-canvas px-3.5 py-2.5">
+      <span className="font-mono text-[22px] font-medium tracking-[0.12em] text-ink">
         {code.match(/.{1,3}/g)?.join(" ") || code}
       </span>
-      <div className="relative w-7 h-7 shrink-0">
-        <svg viewBox="0 0 36 36" className="w-7 h-7 -rotate-90">
-          <circle cx="18" cy="18" r="15.5" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+
+      <div className="relative h-8 w-8 shrink-0" title={`Refreshes in ${secondsLeft}s`}>
+        <svg viewBox="0 0 36 36" className="h-8 w-8 -rotate-90" aria-hidden="true">
+          <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e3dfd3" strokeWidth="3" />
           <circle
             cx="18"
             cy="18"
             r="15.5"
             fill="none"
-            stroke={secondsLeft <= 5 ? "#F87171" : "#8B72FF"}
+            stroke={secondsLeft <= 5 ? "#b42318" : "#2f4fb8"}
             strokeWidth="3"
             strokeDasharray={`${(pct / 100) * 97.4} 97.4`}
             strokeLinecap="round"
             className="transition-all duration-1000 ease-linear"
           />
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-[#A8A4BD]">
+        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-muted">
           {secondsLeft}
         </span>
       </div>
@@ -80,7 +82,7 @@ const secretTypeLabel = (value) =>
   SECRET_TYPES.find((t) => t.value === value)?.label || "Other";
 
 // ============================================================
-// PREMIUM ICON BUTTONS (edit / delete)
+// ICON BUTTONS (favorite / edit / delete)
 // ============================================================
 
 function FavoriteButton({ active, onClick, disabled }) {
@@ -88,18 +90,13 @@ function FavoriteButton({ active, onClick, disabled }) {
     <button
       type="button"
       title={active ? "Remove from favorites" : "Add to favorites"}
-      aria-label="Toggle favorite"
+      aria-label={active ? "Remove from favorites" : "Add to favorites"}
+      aria-pressed={active}
       onClick={onClick}
       disabled={disabled}
-      className={`p-2 rounded-[10px] transition-all duration-150 active:scale-90 disabled:opacity-40 disabled:pointer-events-none ${
-        active
-          ? "text-[#FBBF24] bg-[#FBBF24]/10 hover:bg-[#FBBF24]/20"
-          : "text-[#A8A4BD] bg-white/[0.03] hover:text-[#FBBF24] hover:bg-[#FBBF24]/10"
-      }`}
+      className={`icon-btn ${active ? "!text-warn" : ""}`}
     >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
+      <i className={active ? "ri-star-fill" : "ri-star-line"} aria-hidden="true" />
     </button>
   );
 }
@@ -112,23 +109,9 @@ function EditIconButton({ onClick, disabled, label = "Edit" }) {
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="group/edit relative p-2 rounded-[10px] border border-transparent text-[#A8A4BD] bg-white/[0.03] hover:bg-[#8B72FF]/15 hover:border-[#8B72FF]/30 hover:text-[#C9BFFF] active:scale-90 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none"
+      className="icon-btn"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="transition-transform duration-150 group-hover/edit:-translate-y-0.5"
-      >
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
+      <i className="ri-pencil-line" aria-hidden="true" />
     </button>
   );
 }
@@ -141,29 +124,46 @@ function DeleteIconButton({ onClick, disabled, label = "Delete" }) {
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="group/del relative p-2 rounded-[10px] border border-transparent text-[#A8A4BD] bg-white/[0.03] hover:bg-[#F87171]/15 hover:border-[#F87171]/30 hover:text-[#F87171] active:scale-90 transition-all duration-150 disabled:opacity-40 disabled:pointer-events-none"
+      className="icon-btn hover:!bg-danger-tint hover:!text-danger"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="15"
-        height="15"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="transition-transform duration-150 group-hover/del:rotate-6"
-      >
-        <path d="M3 6h18" />
-        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-        <path d="M10 11v6" />
-        <path d="M14 11v6" />
-      </svg>
+      <i className="ri-delete-bin-6-line" aria-hidden="true" />
     </button>
   );
 }
+
+// Small text action used for Show / Hide / Copy inside value rows.
+function RowAction({ onClick, title, icon, children }) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium text-ink-soft transition-colors hover:bg-sunken hover:text-ink"
+    >
+      <i className={`${icon} text-[14px]`} aria-hidden="true" />
+      {children}
+    </button>
+  );
+}
+
+function EmptyState({ icon, title, body, actionLabel, onAction }) {
+  return (
+    <div className="panel px-6 py-16 text-center">
+      <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-xl bg-sunken text-ink-soft">
+        <i className={`${icon} text-[24px]`} aria-hidden="true" />
+      </div>
+      <h3 className="text-lg font-semibold tracking-tight text-ink">{title}</h3>
+      <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted">{body}</p>
+      <button type="button" onClick={onAction} className="btn btn-primary mt-6">
+        <i className="ri-add-line text-[18px]" aria-hidden="true" />
+        {actionLabel}
+      </button>
+    </div>
+  );
+}
+
+const VALUE_ROW =
+  "flex items-center justify-between gap-3 rounded-lg border border-line bg-canvas px-3.5 py-2";
 
 export default function Vault({ token }) {
   const [activeTab, setActiveTab] = useState("cards");
@@ -481,15 +481,29 @@ export default function Vault({ token }) {
   // RENDER
   // ============================================================
 
-  return (
-    <div className="relative min-h-screen bg-[#0A0810] font-['Inter',sans-serif] text-[#F5F3FF] overflow-x-hidden">
-      {/* Ambient premium glow */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 h-[420px] w-[420px] rounded-full bg-[#8B72FF]/20 blur-[120px]" />
-        <div className="absolute top-1/3 -right-20 h-[380px] w-[380px] rounded-full bg-[#FBBF24]/10 blur-[130px]" />
-        <div className="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-[#8B72FF]/10 blur-[100px]" />
-      </div>
+  useEscapeKey(() => setDeleteTarget(null), Boolean(deleteTarget) && !deletingId);
 
+  const TABS = [
+    { id: "cards", label: "Cards", icon: "ri-bank-card-line", count: cards.length },
+    { id: "secrets", label: "Secrets & TPINs", icon: "ri-lock-password-line", count: secrets.length },
+    { id: "auth", label: "Authenticator", icon: "ri-shield-keyhole-line", count: authItems.length },
+  ];
+
+  const ADD_ACTION = {
+    cards: { label: "Add card", onClick: handleAddCard },
+    secrets: { label: "Add secret", onClick: handleAddSecret },
+    auth: { label: "Add authenticator", onClick: handleAddAuth },
+  }[activeTab];
+
+  const deleteNoun =
+    deleteTarget?.type === "card"
+      ? "card"
+      : deleteTarget?.type === "totp"
+        ? "authenticator"
+        : "secret";
+
+  return (
+    <div className="min-h-dvh bg-canvas text-ink">
       {cardModalOpen && (
         <CardForm
           onClose={() => {
@@ -528,37 +542,33 @@ export default function Vault({ token }) {
 
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+          className="dialog-backdrop"
           role="dialog"
           aria-modal="true"
+          aria-labelledby="vault-delete-title"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !deletingId) {
               setDeleteTarget(null);
             }
           }}
         >
-          <div className="w-full max-w-[420px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 p-6">
-            <div className="w-12 h-12 rounded-full bg-[#3F1013] flex items-center justify-center mb-4 text-[20px]">
-              🗑️
+          <div className="dialog max-w-[420px] p-6">
+            <div className="mb-4 grid h-10 w-10 place-items-center rounded-full bg-danger-tint text-danger">
+              <i className="ri-delete-bin-6-line text-[20px]" aria-hidden="true" />
             </div>
-            <h3 className="text-[20px] font-bold text-[#F5F3FF]">
-              Delete{" "}
-              {deleteTarget.type === "card"
-                ? "card"
-                : deleteTarget.type === "totp"
-                ? "authenticator"
-                : "secret"}
-              ?
+            <h3 id="vault-delete-title" className="text-lg font-semibold tracking-tight">
+              Delete this {deleteNoun}?
             </h3>
-            <p className="text-[14px] text-[#A8A4BD] mt-2 leading-6">
-              This action cannot be undone.
+            <p className="mt-2 text-sm leading-6 text-muted">
+              It will be permanently removed. This can’t be undone.
             </p>
-            <div className="flex items-center justify-end gap-3 mt-6">
+            <div className="mt-6 flex items-center justify-end gap-2">
               <button
                 type="button"
+                autoFocus
                 onClick={() => setDeleteTarget(null)}
                 disabled={Boolean(deletingId)}
-                className="px-4 py-2.5 rounded-[10px] bg-white/5 hover:bg-white/10 text-[#F5F3FF] text-[14px] font-semibold disabled:opacity-50 transition-colors"
+                className="btn btn-secondary"
               >
                 Cancel
               </button>
@@ -566,466 +576,406 @@ export default function Vault({ token }) {
                 type="button"
                 onClick={handleDelete}
                 disabled={Boolean(deletingId)}
-                className="min-w-[90px] px-4 py-2.5 rounded-[10px] bg-[#F87171] hover:bg-[#B91C1C] text-[#1a0505] text-[14px] font-semibold disabled:opacity-50 transition-colors"
+                className="btn btn-danger min-w-[96px]"
               >
-                {deletingId ? "Deleting..." : "Delete"}
+                {deletingId ? (
+                  <>
+                    <span className="spinner" aria-hidden="true" />
+                    Deleting
+                  </>
+                ) : (
+                  "Delete"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <main className="relative max-w-[1200px] mx-auto px-[20px] md:px-[32px] pt-[56px] pb-[120px]">
-        {/* HERO HEADER */}
-        <div className="mb-10 flex flex-col gap-2">
-          <span className="inline-flex items-center gap-1.5 w-fit text-[11px] font-semibold uppercase tracking-[0.12em] text-[#FBBF24] bg-[#3A2A08] px-3 py-1 rounded-full border border-[#FBBF24]/20">
-            ✦ Premium Vault
-          </span>
-          <h2 className="text-[34px] md:text-[38px] font-extrabold font-['Manrope',sans-serif] bg-gradient-to-r from-white via-[#F5F3FF] to-[#C9BFFF] bg-clip-text text-transparent">
-            Card &amp; Secrets Vault
-          </h2>
-          <p className="text-[15px] text-[#A8A4BD] max-w-[560px]">
-            Debit / credit cards, TPINs, and other sensitive codes — encrypted end-to-end and visible only to you.
-          </p>
+      <main className="mx-auto max-w-[1200px] px-4 pb-24 pt-10 sm:px-8">
+        {/* HEADER */}
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
+              Cards & secrets
+            </h1>
+            <p className="mt-1 max-w-[560px] text-sm text-muted">
+              Bank cards, TPINs and one-time-code seeds, encrypted and visible only to you.
+            </p>
+          </div>
+
+          <button type="button" onClick={ADD_ACTION.onClick} className="btn btn-primary">
+            <i className="ri-add-line text-[18px]" aria-hidden="true" />
+            {ADD_ACTION.label}
+          </button>
         </div>
 
         {/* TABS */}
-        <div className="inline-flex p-1 mb-8 rounded-[14px] bg-white/[0.04] border border-white/10 backdrop-blur-md">
-          <button
-            type="button"
-            onClick={() => setActiveTab("cards")}
-            className={`px-5 py-2.5 text-[14px] font-semibold rounded-[10px] transition-all ${
-              activeTab === "cards"
-                ? "bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white shadow-[0_4px_16px_rgba(139,114,255,0.35)]"
-                : "text-[#A8A4BD] hover:text-white"
-            }`}
-          >
-            💳 Cards <span className="opacity-70">({cards.length})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("secrets")}
-            className={`px-5 py-2.5 text-[14px] font-semibold rounded-[10px] transition-all ${
-              activeTab === "secrets"
-                ? "bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white shadow-[0_4px_16px_rgba(139,114,255,0.35)]"
-                : "text-[#A8A4BD] hover:text-white"
-            }`}
-          >
-            🔑 Secrets &amp; TPINs <span className="opacity-70">({secrets.length})</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("auth")}
-            className={`px-5 py-2.5 text-[14px] font-semibold rounded-[10px] transition-all ${
-              activeTab === "auth"
-                ? "bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] text-white shadow-[0_4px_16px_rgba(139,114,255,0.35)]"
-                : "text-[#A8A4BD] hover:text-white"
-            }`}
-          >
-            🔐 Authenticator <span className="opacity-70">({authItems.length})</span>
-          </button>
+        <div
+          role="tablist"
+          aria-label="Vault sections"
+          className="mb-6 flex gap-1 overflow-x-auto border-b border-line"
+        >
+          {TABS.map((tab) => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setActiveTab(tab.id)}
+                className={`-mb-px flex shrink-0 items-center gap-2 border-b-2 px-3.5 pb-3 pt-2 text-sm font-medium transition-colors ${
+                  active
+                    ? "border-ink text-ink"
+                    : "border-transparent text-muted hover:text-ink"
+                }`}
+              >
+                <i className={`${tab.icon} text-[17px]`} aria-hidden="true" />
+                {tab.label}
+                <span
+                  className={`rounded-full px-1.5 text-xs tabular-nums ${
+                    active ? "bg-sunken text-ink" : "text-faint"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* SEARCH & FILTER */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A4BD] text-[14px]">⌕</span>
+            <i
+              className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-faint"
+              aria-hidden="true"
+            />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, bank, issuer, category..."
-              className="w-full bg-white/[0.03] border border-white/10 text-[#F5F3FF] text-[14px] pl-9 pr-4 py-2.5 rounded-[12px] placeholder:text-[#726C8A] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]/40"
+              placeholder="Search by name, bank, issuer or category"
+              aria-label="Search vault"
+              className="field pl-10"
             />
           </div>
           <button
             type="button"
             onClick={() => setFavoritesOnly((v) => !v)}
-            className={`px-4 py-2.5 rounded-[12px] text-[13px] font-semibold border transition-colors whitespace-nowrap ${
-              favoritesOnly
-                ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
-                : "bg-white/[0.03] border-white/10 text-[#A8A4BD] hover:text-white"
+            aria-pressed={favoritesOnly}
+            className={`btn ${
+              favoritesOnly ? "border-warn/40 bg-warn-tint text-warn" : "btn-secondary"
             }`}
           >
-            {favoritesOnly ? "★" : "☆"} Favorites
+            <i
+              className={`${favoritesOnly ? "ri-star-fill" : "ri-star-line"} text-[16px]`}
+              aria-hidden="true"
+            />
+            Favorites
           </button>
         </div>
 
         {error && (
-          <div className="bg-[#3F1013] border border-[#F87171]/30 rounded-[14px] p-4 mb-6 flex items-center justify-between gap-4">
-            <p className="text-[13px] text-[#F87171]">{error}</p>
-            <button
-              type="button"
-              onClick={fetchAll}
-              className="text-[12px] font-semibold text-[#F87171] hover:underline whitespace-nowrap"
-            >
+          <div
+            role="alert"
+            className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-danger/25 bg-danger-tint p-4"
+          >
+            <div className="flex items-center gap-3">
+              <i className="ri-error-warning-line text-[18px] text-danger" aria-hidden="true" />
+              <p className="text-sm text-danger">{error}</p>
+            </div>
+            <button type="button" onClick={fetchAll} className="btn btn-secondary h-8 px-3 text-[13px]">
               Retry
             </button>
           </div>
         )}
 
         {loading ? (
-          <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-            <div className="w-10 h-10 border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-[15px] text-[#A8A4BD] font-medium">Loading your vault...</p>
+          <div className="panel flex items-center justify-center gap-3 p-12 text-muted" role="status">
+            <span className="spinner text-accent" aria-hidden="true" />
+            <p className="text-sm">Loading your vault…</p>
           </div>
         ) : activeTab === "cards" ? (
-          <>
-            <div className="flex justify-end mb-5">
-              <button
-                type="button"
-                onClick={handleAddCard}
-                className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold shadow-[0_4px_16px_rgba(139,114,255,0.3)] transition-all hover:-translate-y-0.5"
-              >
-                + Add Card
-              </button>
-            </div>
+          filteredCards.length === 0 ? (
+            <EmptyState
+              icon="ri-bank-card-line"
+              title="No cards saved yet"
+              body="Keep debit and credit card details in one encrypted place."
+              actionLabel="Add your first card"
+              onAction={handleAddCard}
+            />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {filteredCards.map((card) => {
+                const id = getId(card);
+                const revealed = revealedCardFields[id] || {};
+                const isDeleting = deletingId === id;
+                const isCredit = card.cardType === "credit";
 
-            {filteredCards.length === 0 ? (
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-                <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
-                  💳
-                </div>
-                <h3 className="text-[18px] font-semibold text-[#F5F3FF] mb-2">No cards yet</h3>
-                <p className="text-[14px] text-[#A8A4BD] mb-6">
-                  Add your debit or credit card details to keep them safe.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleAddCard}
-                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold transition-all"
-                >
-                  + Add your first card
-                </button>
-              </div>
-            ) : (
-              <div className="grid gap-5 sm:grid-cols-2">
-                {filteredCards.map((card) => {
-                  const id = getId(card);
-                  const revealed = revealedCardFields[id] || {};
-                  const isDeleting = deletingId === id;
-                  const isCredit = card.cardType === "credit";
-
-                  return (
-                    <div
-                      key={id}
-                      className={`relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] p-5 transition-all hover:border-white/20 ${
-                        isDeleting ? "opacity-60" : ""
-                      }`}
-                    >
-                      {/* Decorative gradient stripe */}
-                      <div
-                        className={`absolute -top-16 -right-16 h-40 w-40 rounded-full blur-3xl opacity-30 ${
-                          isCredit ? "bg-[#FBBF24]" : "bg-[#8B72FF]"
-                        }`}
-                      />
-
-                      <div className="relative flex items-start justify-between mb-4">
-                        <div>
-                          <span
-                            className={`inline-block text-[10px] font-bold uppercase tracking-[0.08em] px-2.5 py-1 rounded-full mb-2 ${
-                              isCredit
-                                ? "bg-[#3A2A08] text-[#FBBF24] border border-[#FBBF24]/20"
-                                : "bg-[#8B72FF]/15 text-[#C9BFFF] border border-[#8B72FF]/20"
-                            }`}
-                          >
-                            {isCredit ? "✦ Credit" : "Debit"}
-                          </span>
-                          <h3 className="text-[16px] font-bold text-[#F5F3FF]">
-                            {card.nickname || card.bankName}
-                          </h3>
-                          <p className="text-[12px] text-[#A8A4BD]">
-                            {card.bankName} · {card.cardholderName}
-                          </p>
-                        </div>
-
-                        <div className="flex gap-1.5">
-                          <FavoriteButton
-                            active={Boolean(card.isFavorite)}
-                            disabled={togglingFavoriteId === id}
-                            onClick={() => toggleFavorite("card", card)}
-                          />
-                          <EditIconButton
-                            label="Edit card"
-                            disabled={isDeleting}
-                            onClick={() => handleEditCard(card)}
-                          />
-                          <DeleteIconButton
-                            label="Delete card"
-                            disabled={isDeleting}
-                            onClick={() => setDeleteTarget({ type: "card", item: card })}
-                          />
-                        </div>
+                return (
+                  <article
+                    key={id}
+                    className={`panel p-5 ${isDeleting ? "opacity-60" : ""}`}
+                  >
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="truncate text-[15px] font-semibold text-ink">
+                          {card.nickname || card.bankName}
+                        </h3>
+                        <p className="mt-0.5 truncate text-[13px] text-muted">
+                          {card.bankName} · {card.cardholderName}
+                        </p>
+                        <span
+                          className={`mt-2 inline-block rounded px-1.5 py-0.5 text-xs font-medium ${
+                            isCredit ? "bg-accent-tint text-accent" : "bg-sunken text-ink-soft"
+                          }`}
+                        >
+                          {isCredit ? "Credit" : "Debit"}
+                        </span>
                       </div>
-
-                      <div className="relative space-y-2.5 text-[13px]">
-                        <div className="flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
-                          <span className="font-mono tracking-wider text-[#F5F3FF]">
-                            {revealed.number
-                              ? card.cardNumber?.replace(/(.{4})/g, "$1 ").trim()
-                              : card.maskedCardNumber || "•••• •••• •••• ••••"}
-                          </span>
-                          <div className="flex gap-2.5">
-                            <button
-                              type="button"
-                              title={revealed.number ? "Auto-hides in 10s" : "Show"}
-                              onClick={() => toggleCardField(id, "number")}
-                              className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                            >
-                              {revealed.number ? "Hide" : "Show"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => copyToClipboard(card.cardNumber, "Card number")}
-                              className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                            >
-                              Copy
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2.5">
-                          <div className="flex-1 flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
-                            <span className="text-[#A8A4BD]">
-                              Exp {card.expiryMonth}/{card.expiryYear}
-                            </span>
-                          </div>
-
-                          <div className="flex-1 flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
-                            <span className="font-mono text-[#F5F3FF]">
-                              {revealed.cvv ? card.cvv : "•••"}
-                            </span>
-                            <button
-                              type="button"
-                              title={revealed.cvv ? "Auto-hides in 10s" : "Show CVV"}
-                              onClick={() => toggleCardField(id, "cvv")}
-                              className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                            >
-                              {revealed.cvv ? "Hide" : "CVV"}
-                            </button>
-                          </div>
-                        </div>
-
-                        {card.pin && (
-                          <div className="flex items-center justify-between bg-black/20 border border-white/10 rounded-[12px] px-3.5 py-2.5">
-                            <span className="text-[#A8A4BD]">
-                              PIN:{" "}
-                              <span className="font-mono text-[#F5F3FF]">
-                                {revealed.pin ? card.pin : "••••"}
-                              </span>
-                            </span>
-                            <div className="flex gap-2.5">
-                              <button
-                                type="button"
-                                title={revealed.pin ? "Auto-hides in 10s" : "Show"}
-                                onClick={() => toggleCardField(id, "pin")}
-                                className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                              >
-                                {revealed.pin ? "Hide" : "Show"}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => copyToClipboard(card.pin, "PIN")}
-                                className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                              >
-                                Copy
-                              </button>
-                            </div>
-                          </div>
-                        )}
-
-                        {card.notes && (
-                          <p className="text-[12px] text-[#A8A4BD] italic pt-1">{card.notes}</p>
-                        )}
+                      <div className="flex shrink-0 gap-0.5">
+                        <FavoriteButton
+                          active={Boolean(card.isFavorite)}
+                          disabled={togglingFavoriteId === id}
+                          onClick={() => toggleFavorite("card", card)}
+                        />
+                        <EditIconButton
+                          label="Edit card"
+                          disabled={isDeleting}
+                          onClick={() => handleEditCard(card)}
+                        />
+                        <DeleteIconButton
+                          label="Delete card"
+                          disabled={isDeleting}
+                          onClick={() => setDeleteTarget({ type: "card", item: card })}
+                        />
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        ) : activeTab === "secrets" ? (
-          <>
-            <div className="flex justify-end mb-5">
-              <button
-                type="button"
-                onClick={handleAddSecret}
-                className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold shadow-[0_4px_16px_rgba(139,114,255,0.3)] transition-all hover:-translate-y-0.5"
-              >
-                + Add Secret
-              </button>
-            </div>
 
-            {filteredSecrets.length === 0 ? (
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-                <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
-                  🔑
-                </div>
-                <h3 className="text-[18px] font-semibold text-[#F5F3FF] mb-2">No secrets yet</h3>
-                <p className="text-[14px] text-[#A8A4BD] mb-6">
-                  Save TPINs, UPI PINs, security answers, or any other sensitive code.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleAddSecret}
-                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold transition-all"
-                >
-                  + Add your first secret
-                </button>
-              </div>
-            ) : (
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] overflow-hidden">
-                <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/10 bg-black/20 text-[12px] font-semibold text-[#A8A4BD] uppercase tracking-wide">
-                  <div className="col-span-3">Title</div>
-                  <div className="col-span-2">Type</div>
-                  <div className="col-span-2">Issuer</div>
-                  <div className="col-span-3">Value</div>
-                  <div className="col-span-2 text-right">Actions</div>
-                </div>
-
-                <div className="flex flex-col divide-y divide-white/10">
-                  {filteredSecrets.map((secret) => {
-                    const id = getId(secret);
-                    const isVisible = Boolean(revealedSecrets[id]);
-                    const isDeleting = deletingId === id;
-
-                    return (
-                      <div
-                        key={id}
-                        className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center px-5 md:px-6 py-4 hover:bg-white/[0.04] transition-colors ${
-                          isDeleting ? "opacity-60" : ""
-                        }`}
-                      >
-                        <div className="md:col-span-3 font-semibold text-[14px] text-[#F5F3FF] truncate">
-                          {secret.title}
-                        </div>
-                        <div className="md:col-span-2 text-[13px] text-[#A8A4BD]">
-                          {secretTypeLabel(secret.secretType)}
-                        </div>
-                        <div className="md:col-span-2 text-[13px] text-[#A8A4BD] truncate">
-                          {secret.issuer || "—"}
-                        </div>
-                        <div className="md:col-span-3 flex items-center gap-2.5">
-                          <span className="font-mono text-[13px] text-[#F5F3FF]">
-                            {isVisible ? secret.value : "•".repeat(Math.max(String(secret.value || "").length, 4))}
-                          </span>
-                          <button
-                            type="button"
-                            title={isVisible ? "Auto-hides in 10s" : "Show"}
-                            onClick={() => toggleSecretVisible(id)}
-                            className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
+                    <div className="space-y-2 text-[13px]">
+                      <div className={VALUE_ROW}>
+                        <span className="min-w-0 truncate font-mono tracking-wider text-ink">
+                          {revealed.number
+                            ? card.cardNumber?.replace(/(.{4})/g, "$1 ").trim()
+                            : card.maskedCardNumber || "•••• •••• •••• ••••"}
+                        </span>
+                        <div className="flex shrink-0 gap-0.5">
+                          <RowAction
+                            title={revealed.number ? "Auto-hides in 10s" : "Show card number"}
+                            icon={revealed.number ? "ri-eye-off-line" : "ri-eye-line"}
+                            onClick={() => toggleCardField(id, "number")}
                           >
-                            {isVisible ? "Hide" : "Show"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(secret.value, "Value")}
-                            className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
+                            {revealed.number ? "Hide" : "Show"}
+                          </RowAction>
+                          <RowAction
+                            title="Copy card number"
+                            icon="ri-file-copy-line"
+                            onClick={() => copyToClipboard(card.cardNumber, "Card number")}
                           >
                             Copy
-                          </button>
-                        </div>
-                        <div className="md:col-span-2 flex justify-end gap-1.5">
-                          <FavoriteButton
-                            active={Boolean(secret.isFavorite)}
-                            disabled={togglingFavoriteId === id}
-                            onClick={() => toggleFavorite("secret", secret)}
-                          />
-                          <EditIconButton
-                            label="Edit secret"
-                            disabled={isDeleting}
-                            onClick={() => handleEditSecret(secret)}
-                          />
-                          <DeleteIconButton
-                            label="Delete secret"
-                            disabled={isDeleting}
-                            onClick={() => setDeleteTarget({ type: "secret", item: secret })}
-                          />
+                          </RowAction>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="flex justify-end mb-5">
-              <button
-                type="button"
-                onClick={handleAddAuth}
-                className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold shadow-[0_4px_16px_rgba(139,114,255,0.3)] transition-all hover:-translate-y-0.5"
-              >
-                + Add Authenticator
-              </button>
-            </div>
 
-            {filteredAuthItems.length === 0 ? (
-              <div className="bg-white/[0.03] backdrop-blur-xl rounded-[20px] border border-white/10 p-16 text-center">
-                <div className="w-16 h-16 bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-5 text-[26px]">
-                  🔐
-                </div>
-                <h3 className="text-[18px] font-semibold text-[#F5F3FF] mb-2">No authenticators yet</h3>
-                <p className="text-[14px] text-[#A8A4BD] mb-6">
-                  Store a TOTP secret to generate live 6-digit codes for another site's 2FA.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleAddAuth}
-                  className="bg-gradient-to-r from-[#8B72FF] to-[#6D5AE0] hover:from-[#9c86ff] hover:to-[#7c68ec] text-white px-5 py-2.5 rounded-[12px] text-[14px] font-semibold transition-all"
-                >
-                  + Add your first authenticator
-                </button>
+                      <div className="flex gap-2">
+                        <div className={`${VALUE_ROW} flex-1`}>
+                          <span className="text-muted">
+                            Exp {card.expiryMonth}/{card.expiryYear}
+                          </span>
+                        </div>
+                        <div className={`${VALUE_ROW} flex-1`}>
+                          <span className="font-mono text-ink">
+                            {revealed.cvv ? card.cvv : "•••"}
+                          </span>
+                          <RowAction
+                            title={revealed.cvv ? "Auto-hides in 10s" : "Show CVV"}
+                            icon={revealed.cvv ? "ri-eye-off-line" : "ri-eye-line"}
+                            onClick={() => toggleCardField(id, "cvv")}
+                          >
+                            {revealed.cvv ? "Hide" : "CVV"}
+                          </RowAction>
+                        </div>
+                      </div>
+
+                      {card.pin && (
+                        <div className={VALUE_ROW}>
+                          <span className="text-muted">
+                            PIN{" "}
+                            <span className="ml-1 font-mono text-ink">
+                              {revealed.pin ? card.pin : "••••"}
+                            </span>
+                          </span>
+                          <div className="flex shrink-0 gap-0.5">
+                            <RowAction
+                              title={revealed.pin ? "Auto-hides in 10s" : "Show PIN"}
+                              icon={revealed.pin ? "ri-eye-off-line" : "ri-eye-line"}
+                              onClick={() => toggleCardField(id, "pin")}
+                            >
+                              {revealed.pin ? "Hide" : "Show"}
+                            </RowAction>
+                            <RowAction
+                              title="Copy PIN"
+                              icon="ri-file-copy-line"
+                              onClick={() => copyToClipboard(card.pin, "PIN")}
+                            >
+                              Copy
+                            </RowAction>
+                          </div>
+                        </div>
+                      )}
+
+                      {card.notes && (
+                        <p className="pt-1 text-[13px] text-muted">{card.notes}</p>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )
+        ) : activeTab === "secrets" ? (
+          filteredSecrets.length === 0 ? (
+            <EmptyState
+              icon="ri-lock-password-line"
+              title="No secrets saved yet"
+              body="Store TPINs, UPI PINs, security answers or any other sensitive code."
+              actionLabel="Add your first secret"
+              onAction={handleAddSecret}
+            />
+          ) : (
+            <div className="panel overflow-hidden">
+              <div className="hidden grid-cols-12 gap-4 border-b border-line bg-sunken/60 px-6 py-3 text-xs font-medium text-muted md:grid">
+                <div className="col-span-3">Title</div>
+                <div className="col-span-2">Type</div>
+                <div className="col-span-2">Issuer</div>
+                <div className="col-span-3">Value</div>
+                <div className="col-span-2 text-right">Actions</div>
               </div>
-            ) : (
-              <div className="grid gap-5 sm:grid-cols-2">
-                {filteredAuthItems.map((item) => {
-                  const id = getId(item);
+
+              <ul className="divide-y divide-line">
+                {filteredSecrets.map((secret) => {
+                  const id = getId(secret);
+                  const isVisible = Boolean(revealedSecrets[id]);
                   const isDeleting = deletingId === id;
 
                   return (
-                    <div
+                    <li
                       key={id}
-                      className={`relative overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.03] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] p-5 transition-all hover:border-white/20 ${
+                      className={`grid grid-cols-1 items-center gap-2 px-4 py-4 transition-colors hover:bg-canvas/70 md:grid-cols-12 md:gap-4 md:px-6 ${
                         isDeleting ? "opacity-60" : ""
                       }`}
                     >
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-[16px] font-bold text-[#F5F3FF]">{item.issuer}</h3>
-                          {item.accountName && (
-                            <p className="text-[12px] text-[#A8A4BD]">{item.accountName}</p>
-                          )}
-                        </div>
-                        <div className="flex gap-1">
-                          <FavoriteButton
-                            active={Boolean(item.isFavorite)}
-                            disabled={togglingFavoriteId === id}
-                            onClick={() => toggleFavorite("totp", item)}
-                          />
-                          <EditIconButton
-                            label="Edit authenticator"
-                            disabled={isDeleting}
-                            onClick={() => handleEditAuth(item)}
-                          />
-                          <DeleteIconButton
-                            label="Delete authenticator"
-                            disabled={isDeleting}
-                            onClick={() => setDeleteTarget({ type: "totp", item })}
-                          />
-                        </div>
+                      <div className="truncate text-sm font-medium text-ink md:col-span-3">
+                        {secret.title}
                       </div>
-
-                      <TotpCodeDisplay secret={item.secret} />
-
-                      {item.notes && <p className="text-[12px] text-[#A8A4BD] italic pt-2">{item.notes}</p>}
-                    </div>
+                      <div className="text-[13px] text-muted md:col-span-2">
+                        {secretTypeLabel(secret.secretType)}
+                      </div>
+                      <div className="truncate text-[13px] text-muted md:col-span-2">
+                        {secret.issuer || "—"}
+                      </div>
+                      <div className="flex min-w-0 items-center gap-1 md:col-span-3">
+                        <span className="min-w-0 truncate font-mono text-[13px] text-ink">
+                          {isVisible
+                            ? secret.value
+                            : "•".repeat(Math.max(String(secret.value || "").length, 4))}
+                        </span>
+                        <RowAction
+                          title={isVisible ? "Auto-hides in 10s" : "Show value"}
+                          icon={isVisible ? "ri-eye-off-line" : "ri-eye-line"}
+                          onClick={() => toggleSecretVisible(id)}
+                        >
+                          <span className="sr-only">{isVisible ? "Hide" : "Show"}</span>
+                        </RowAction>
+                        <RowAction
+                          title="Copy value"
+                          icon="ri-file-copy-line"
+                          onClick={() => copyToClipboard(secret.value, "Value")}
+                        >
+                          <span className="sr-only">Copy</span>
+                        </RowAction>
+                      </div>
+                      <div className="flex justify-end gap-0.5 md:col-span-2">
+                        <FavoriteButton
+                          active={Boolean(secret.isFavorite)}
+                          disabled={togglingFavoriteId === id}
+                          onClick={() => toggleFavorite("secret", secret)}
+                        />
+                        <EditIconButton
+                          label="Edit secret"
+                          disabled={isDeleting}
+                          onClick={() => handleEditSecret(secret)}
+                        />
+                        <DeleteIconButton
+                          label="Delete secret"
+                          disabled={isDeleting}
+                          onClick={() => setDeleteTarget({ type: "secret", item: secret })}
+                        />
+                      </div>
+                    </li>
                   );
                 })}
-              </div>
-            )}
-          </>
+              </ul>
+            </div>
+          )
+        ) : filteredAuthItems.length === 0 ? (
+          <EmptyState
+            icon="ri-shield-keyhole-line"
+            title="No authenticators yet"
+            body="Store a TOTP secret to get live 6-digit codes for another site’s two-factor login."
+            actionLabel="Add your first authenticator"
+            onAction={handleAddAuth}
+          />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {filteredAuthItems.map((item) => {
+              const id = getId(item);
+              const isDeleting = deletingId === id;
+
+              return (
+                <article
+                  key={id}
+                  className={`panel p-5 ${isDeleting ? "opacity-60" : ""}`}
+                >
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-[15px] font-semibold text-ink">
+                        {item.issuer}
+                      </h3>
+                      {item.accountName && (
+                        <p className="mt-0.5 truncate text-[13px] text-muted">
+                          {item.accountName}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex shrink-0 gap-0.5">
+                      <FavoriteButton
+                        active={Boolean(item.isFavorite)}
+                        disabled={togglingFavoriteId === id}
+                        onClick={() => toggleFavorite("totp", item)}
+                      />
+                      <EditIconButton
+                        label="Edit authenticator"
+                        disabled={isDeleting}
+                        onClick={() => handleEditAuth(item)}
+                      />
+                      <DeleteIconButton
+                        label="Delete authenticator"
+                        disabled={isDeleting}
+                        onClick={() => setDeleteTarget({ type: "totp", item })}
+                      />
+                    </div>
+                  </div>
+                  <TotpCodeDisplay secret={item.secret} />
+                  {item.notes && (
+                    <p className="pt-3 text-[13px] text-muted">{item.notes}</p>
+                  )}
+                </article>
+              );
+            })}
+          </div>
         )}
       </main>
     </div>

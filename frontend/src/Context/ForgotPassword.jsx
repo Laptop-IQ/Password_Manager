@@ -1,17 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import {
-  AlertCircle,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  KeyRound,
-  Loader2,
-  Lock,
-  Mail,
-} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 /* =========================================================
@@ -588,66 +576,13 @@ const ForgotPassword = () => {
   ======================================================= */
 
   return (
-    <main
-      className="
-        relative
-        flex
-        min-h-[100dvh]
-        w-full
-        items-center
-        justify-center
-        overflow-hidden
-        bg-gradient-to-br
-        from-[#f8f7ff]
-        via-white
-        to-[#f3f0ff]
-        px-4
-        py-6
-        sm:px-6
-        sm:py-8
-      "
+    <div
+      className="flex min-h-[calc(100dvh-4rem)] w-full items-center justify-center px-4 py-10 sm:px-6"
     >
-      {/* =====================================================
-          BACKGROUND GLOW
-      ====================================================== */}
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -right-28
-          -top-28
-          h-72
-          w-72
-          rounded-full
-          bg-purple-300/20
-          blur-3xl
-          sm:-right-36
-          sm:-top-36
-          sm:h-96
-          sm:w-96
-        "
-      />
+      
 
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -bottom-28
-          -left-28
-          h-72
-          w-72
-          rounded-full
-          bg-blue-300/15
-          blur-3xl
-          sm:-bottom-36
-          sm:-left-36
-          sm:h-96
-          sm:w-96
-        "
-      />
+      
 
       {/* =====================================================
           CARD
@@ -656,89 +591,16 @@ const ForgotPassword = () => {
       <section className="relative w-full max-w-[410px]">
         {/* Gradient border */}
 
-        <div
-          aria-hidden="true"
-          className="
-            pointer-events-none
-            absolute
-            -inset-[1px]
-            rounded-[25px]
-            bg-gradient-to-r
-            from-[#7c3aed]
-            via-[#c026d3]
-            to-[#3b82f6]
-            opacity-75
-          "
-        />
+        
 
         <div
-          className="
-            relative
-            w-full
-            overflow-hidden
-            rounded-[24px]
-            border
-            border-white
-            bg-white
-            px-6
-            py-7
-            shadow-[0_20px_55px_rgba(76,29,149,0.14)]
-            sm:px-9
-            sm:py-8
-          "
+          className="relative w-full rounded-xl border border-line bg-surface px-6 py-8 shadow-panel sm:px-9 sm:py-9"
         >
-          {/* =================================================
-              INNER GLOW
-          ================================================== */}
 
-          <div
-            aria-hidden="true"
-            className="
-              pointer-events-none
-              absolute
-              -right-20
-              -top-20
-              h-44
-              w-44
-              rounded-full
-              bg-purple-200/15
-              blur-3xl
-            "
-          />
+          
 
-          {/* =================================================
-              DOT PATTERN
-          ================================================== */}
 
-          <div
-            aria-hidden="true"
-            className="
-              pointer-events-none
-              absolute
-              right-5
-              top-5
-              z-10
-              grid
-              grid-cols-5
-              gap-[4px]
-              opacity-25
-            "
-          >
-            {Array.from({
-              length: 25,
-            }).map((_, index) => (
-              <span
-                key={index}
-                className="
-                  block
-                  h-[2px]
-                  w-[2px]
-                  rounded-full
-                  bg-[#7c3aed]
-                "
-              />
-            ))}
-          </div>
+          
 
           {/* =================================================
               HEADER
@@ -759,90 +621,33 @@ const ForgotPassword = () => {
               onClick={handleBack}
               disabled={isLoading || isResending}
               aria-label="Go back"
-              className="
-                absolute
-                left-0
-                top-0
-                flex
-                h-8
-                w-8
-                items-center
-                justify-center
-                rounded-lg
-                text-gray-400
-                transition-all
-                duration-200
-                hover:bg-purple-50
-                hover:text-purple-600
-                focus:outline-none
-                focus:ring-2
-                focus:ring-purple-500/30
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-              "
+              className="icon-btn absolute left-0 top-0"
             >
-              <ArrowLeft size={17} aria-hidden="true" />
+              <i className="ri-arrow-left-line text-[17px]" aria-hidden="true" />
             </button>
 
             {/* Icon */}
 
             <div
-              className="
-                mx-auto
-                mb-3
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-[14px]
-                bg-gradient-to-br
-                from-[#7c3aed]
-                to-[#3b82f6]
-                shadow-lg
-                shadow-purple-500/20
-              "
+              className="mx-auto mb-4 grid h-11 w-11 place-items-center rounded-xl bg-primary text-white"
             >
               {step === 1 ? (
-                <KeyRound size={24} className="text-white" aria-hidden="true" />
+                <i className="ri-key-2-line text-[24px] text-ink" aria-hidden="true" />
               ) : (
-                <Lock size={23} className="text-white" aria-hidden="true" />
+                <i className="ri-lock-line text-[23px] text-ink" aria-hidden="true" />
               )}
             </div>
 
             {/* Title */}
 
             <h1
-              className="
-                whitespace-nowrap
-                px-7
-                text-[27px]
-                font-extrabold
-                leading-tight
-                tracking-[-0.03em]
-                text-transparent
-                bg-gradient-to-r
-                from-[#7c3aed]
-                via-[#c026d3]
-                to-[#3b82f6]
-                bg-clip-text
-                sm:text-[30px]
-              "
+              className="text-2xl font-semibold tracking-tight text-ink"
             >
               {step === 1 ? "Forgot Password" : "Reset Password"}
             </h1>
 
             <p
-              className="
-                mx-auto
-                mt-2
-                max-w-[310px]
-                px-2
-                text-[12px]
-                leading-5
-                text-gray-500
-                sm:text-[13px]
-              "
+              className="mx-auto mt-2 max-w-[310px] px-2 text-[12px] leading-5 text-muted sm:text-[13px]"
             >
               {step === 1
                 ? "Enter your email to receive a verification code"
@@ -851,19 +656,7 @@ const ForgotPassword = () => {
 
             {/* Underline */}
 
-            <div
-              aria-hidden="true"
-              className="
-                mx-auto
-                mt-3
-                h-[3px]
-                w-12
-                rounded-full
-                bg-gradient-to-r
-                from-[#7c3aed]
-                to-[#3b82f6]
-              "
-            />
+            
           </header>
 
           {/* =================================================
@@ -874,34 +667,9 @@ const ForgotPassword = () => {
             <div
               role="status"
               aria-live="polite"
-              className="
-                relative
-                z-20
-                mb-5
-                flex
-                w-full
-                min-w-0
-                items-start
-                gap-2.5
-                rounded-lg
-                border
-                border-green-200
-                bg-green-50
-                px-3
-                py-2.5
-                text-xs
-                text-green-600
-              "
+              className="relative z-20 mb-5 flex w-full min-w-0 items-start gap-2.5 rounded-lg border border-ok/25 bg-ok-tint px-3 py-2.5 text-xs text-ok"
             >
-              <CheckCircle2
-                size={17}
-                className="
-                  mt-0.5
-                  shrink-0
-                  text-green-500
-                "
-                aria-hidden="true"
-              />
+              <i className="ri-checkbox-circle-line text-[17px] mt-0.5 shrink-0 text-ok" aria-hidden="true" />
 
               <span className="min-w-0 break-words leading-5">{message}</span>
             </div>
@@ -915,34 +683,9 @@ const ForgotPassword = () => {
             <div
               role="alert"
               aria-live="polite"
-              className="
-                relative
-                z-20
-                mb-5
-                flex
-                w-full
-                min-w-0
-                items-start
-                gap-2.5
-                rounded-lg
-                border
-                border-red-200
-                bg-red-50
-                px-3
-                py-2.5
-                text-xs
-                text-red-600
-              "
+              className="relative z-20 mb-5 flex w-full min-w-0 items-start gap-2.5 rounded-lg border border-danger/25 bg-danger-tint px-3 py-2.5 text-xs text-danger"
             >
-              <AlertCircle
-                size={17}
-                className="
-                  mt-0.5
-                  shrink-0
-                  text-red-500
-                "
-                aria-hidden="true"
-              />
+              <i className="ri-error-warning-line text-[17px] mt-0.5 shrink-0 text-danger" aria-hidden="true" />
 
               <span className="min-w-0 break-words leading-5">{error}</span>
             </div>
@@ -965,33 +708,13 @@ const ForgotPassword = () => {
               <div className="mb-5 w-full">
                 <label
                   htmlFor="forgot-email"
-                  className="
-                    mb-2
-                    block
-                    text-[13px]
-                    font-semibold
-                    text-gray-700
-                  "
+                  className="mb-2 block text-[13px] font-semibold text-ink-soft"
                 >
                   Email Address
                 </label>
 
                 <div className="group relative w-full">
-                  <Mail
-                    size={18}
-                    className="
-                      pointer-events-none
-                      absolute
-                      left-3.5
-                      top-1/2
-                      z-10
-                      -translate-y-1/2
-                      text-gray-400
-                      transition-colors
-                      group-focus-within:text-purple-500
-                    "
-                    aria-hidden="true"
-                  />
+                  <i className="ri-mail-line text-[18px] pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-faint transition-colors group-focus-within:text-accent" aria-hidden="true" />
 
                   <input
                     id="forgot-email"
@@ -1012,32 +735,7 @@ const ForgotPassword = () => {
                     maxLength={254}
                     required
                     disabled={isLoading}
-                    className="
-                      box-border
-                      block
-                      h-[48px]
-                      w-full
-                      min-w-0
-                      rounded-[10px]
-                      border
-                      border-gray-200
-                      bg-white
-                      px-10
-                      pr-3
-                      text-[13px]
-                      text-gray-800
-                      outline-none
-                      transition-all
-                      duration-200
-                      placeholder:text-gray-400
-                      hover:border-purple-200
-                      focus:border-purple-500
-                      focus:ring-4
-                      focus:ring-purple-500/10
-                      disabled:cursor-not-allowed
-                      disabled:bg-gray-50
-                      disabled:opacity-70
-                    "
+                    className="field h-11 px-10 pr-3"
                   />
                 </div>
               </div>
@@ -1047,67 +745,13 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="
-                  group
-                  relative
-                  flex
-                  h-[48px]
-                  w-full
-                  items-center
-                  justify-center
-                  gap-2
-                  overflow-hidden
-                  rounded-[10px]
-                  bg-gradient-to-r
-                  from-[#7c3aed]
-                  via-[#c026d3]
-                  to-[#3b82f6]
-                  px-4
-                  text-[13px]
-                  font-bold
-                  text-white
-                  shadow-md
-                  shadow-purple-500/20
-                  transition-all
-                  duration-300
-                  hover:-translate-y-[1px]
-                  hover:shadow-lg
-                  hover:shadow-purple-500/25
-                  focus:outline-none
-                  focus:ring-4
-                  focus:ring-purple-500/20
-                  disabled:cursor-not-allowed
-                  disabled:translate-y-0
-                  disabled:opacity-60
-                "
+                className="btn btn-primary h-11 w-full"
               >
-                <span
-                  aria-hidden="true"
-                  className="
-                    absolute
-                    inset-0
-                    -translate-x-full
-                    bg-gradient-to-r
-                    from-transparent
-                    via-white/20
-                    to-transparent
-                    transition-transform
-                    duration-700
-                    group-hover:translate-x-full
-                  "
-                />
+                
 
                 {isLoading ? (
                   <>
-                    <Loader2
-                      size={17}
-                      className="
-                        relative
-                        z-10
-                        animate-spin
-                      "
-                      aria-hidden="true"
-                    />
+                    <span className="spinner relative z-10" aria-hidden="true" />
 
                     <span className="relative z-10">Sending OTP...</span>
                   </>
@@ -1115,17 +759,7 @@ const ForgotPassword = () => {
                   <>
                     <span className="relative z-10">Send OTP</span>
 
-                    <ArrowRight
-                      size={17}
-                      className="
-                        relative
-                        z-10
-                        transition-transform
-                        duration-300
-                        group-hover:translate-x-1
-                      "
-                      aria-hidden="true"
-                    />
+                    <i className="ri-arrow-right-line text-[17px]" aria-hidden="true" />
                   </>
                 )}
               </button>
@@ -1133,16 +767,11 @@ const ForgotPassword = () => {
               {/* Login */}
 
               <div className="mt-5 text-center">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted">
                   Remember your password?{" "}
                   <Link
                     to="/login"
-                    className="
-                      font-bold
-                      text-purple-600
-                      hover:text-blue-600
-                      hover:underline
-                    "
+                    className="font-medium text-accent hover:text-accent-hover hover:underline"
                   >
                     Sign in
                   </Link>
@@ -1168,43 +797,16 @@ const ForgotPassword = () => {
               {/* Email info */}
 
               <div
-                className="
-                  mb-5
-                  flex
-                  w-full
-                  min-w-0
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-xl
-                  border
-                  border-purple-100
-                  bg-purple-50/60
-                  px-3
-                  py-3
-                "
+                className="mb-5 flex w-full min-w-0 items-center justify-center gap-2 rounded-xl border border-line bg-sunken/60 px-3 py-3"
               >
-                <Mail
-                  size={16}
-                  className="
-                    shrink-0
-                    text-purple-500
-                  "
-                  aria-hidden="true"
-                />
+                <i className="ri-mail-line text-[16px] shrink-0 text-accent" aria-hidden="true" />
 
                 <p
-                  className="
-                    min-w-0
-                    truncate
-                    text-center
-                    text-[11px]
-                    text-gray-600
-                  "
+                  className="min-w-0 truncate text-center text-[11px] text-ink-soft"
                   title={email}
                 >
                   Code sent to{" "}
-                  <strong className="font-semibold text-gray-800">
+                  <strong className="font-semibold text-ink">
                     {email}
                   </strong>
                 </p>
@@ -1213,14 +815,7 @@ const ForgotPassword = () => {
               {/* OTP Label */}
 
               <label
-                className="
-                  mb-3
-                  block
-                  text-center
-                  text-[13px]
-                  font-semibold
-                  text-gray-700
-                "
+                className="mb-3 block text-center text-[13px] font-semibold text-ink-soft"
               >
                 Verification Code
               </label>
@@ -1255,32 +850,7 @@ const ForgotPassword = () => {
                     onChange={(event) => handleOtpChange(event, index)}
                     onKeyDown={(event) => handleOtpKeyDown(event, index)}
                     onPaste={(event) => handleOtpPaste(event, index)}
-                    className="
-                        box-border
-                        h-[46px]
-                        w-[40px]
-                        min-w-0
-                        rounded-[10px]
-                        border
-                        border-gray-200
-                        bg-white
-                        text-center
-                        text-[18px]
-                        font-bold
-                        text-gray-800
-                        outline-none
-                        transition-all
-                        duration-200
-                        hover:border-purple-200
-                        focus:border-purple-500
-                        focus:ring-4
-                        focus:ring-purple-500/10
-                        disabled:cursor-not-allowed
-                        disabled:bg-gray-50
-                        disabled:opacity-60
-                        sm:h-[50px]
-                        sm:w-[44px]
-                      "
+                    className="field h-12 w-[40px] px-0 text-center text-lg font-semibold"
                   />
                 ))}
               </div>
@@ -1298,7 +868,7 @@ const ForgotPassword = () => {
                   text-center
                 "
               >
-                <span className="text-[11px] text-gray-500">
+                <span className="text-[11px] text-muted">
                   Didn't receive the code?
                 </span>
 
@@ -1306,19 +876,7 @@ const ForgotPassword = () => {
                   type="button"
                   onClick={handleResendOTP}
                   disabled={resendTimer > 0 || isResending || isLoading}
-                  className="
-                    rounded
-                    text-[11px]
-                    font-bold
-                    text-purple-600
-                    transition-colors
-                    hover:text-blue-600
-                    hover:underline
-                    focus:outline-none
-                    disabled:cursor-not-allowed
-                    disabled:text-gray-400
-                    disabled:no-underline
-                  "
+                  className="rounded text-[11px] font-medium text-accent transition-colors hover:text-accent-hover hover:underline focus:outline-none disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
                 >
                   {isResending ? (
                     <>Sending...</>
@@ -1335,33 +893,13 @@ const ForgotPassword = () => {
               <div className="mb-5 w-full">
                 <label
                   htmlFor="new-password"
-                  className="
-                    mb-2
-                    block
-                    text-[13px]
-                    font-semibold
-                    text-gray-700
-                  "
+                  className="mb-2 block text-[13px] font-semibold text-ink-soft"
                 >
                   New Password
                 </label>
 
                 <div className="group relative w-full">
-                  <Lock
-                    size={18}
-                    className="
-                      pointer-events-none
-                      absolute
-                      left-3.5
-                      top-1/2
-                      z-10
-                      -translate-y-1/2
-                      text-gray-400
-                      transition-colors
-                      group-focus-within:text-purple-500
-                    "
-                    aria-hidden="true"
-                  />
+                  <i className="ri-lock-line text-[18px] pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-faint transition-colors group-focus-within:text-accent" aria-hidden="true" />
 
                   <input
                     id="new-password"
@@ -1377,32 +915,7 @@ const ForgotPassword = () => {
                     maxLength={128}
                     required
                     disabled={isLoading}
-                    className="
-                      box-border
-                      block
-                      h-[48px]
-                      w-full
-                      min-w-0
-                      rounded-[10px]
-                      border
-                      border-gray-200
-                      bg-white
-                      px-10
-                      pr-12
-                      text-[13px]
-                      text-gray-800
-                      outline-none
-                      transition-all
-                      duration-200
-                      placeholder:text-gray-400
-                      hover:border-purple-200
-                      focus:border-purple-500
-                      focus:ring-4
-                      focus:ring-purple-500/10
-                      disabled:cursor-not-allowed
-                      disabled:bg-gray-50
-                      disabled:opacity-70
-                    "
+                    className="field h-11 px-10 pr-12"
                   />
 
                   <button
@@ -1412,36 +925,17 @@ const ForgotPassword = () => {
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
-                    className="
-                      absolute
-                      right-1.5
-                      top-1/2
-                      z-20
-                      flex
-                      h-9
-                      w-9
-                      -translate-y-1/2
-                      items-center
-                      justify-center
-                      rounded-lg
-                      text-gray-400
-                      transition-colors
-                      hover:bg-purple-50
-                      hover:text-purple-600
-                      focus:outline-none
-                      disabled:cursor-not-allowed
-                      disabled:opacity-50
-                    "
+                    className="icon-btn absolute right-1.5 top-1/2 z-20 h-9 w-9 -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <EyeOff size={17} aria-hidden="true" />
+                      <i className="ri-eye-off-line text-[17px]" aria-hidden="true" />
                     ) : (
-                      <Eye size={17} aria-hidden="true" />
+                      <i className="ri-eye-line text-[17px]" aria-hidden="true" />
                     )}
                   </button>
                 </div>
 
-                <p className="mt-1.5 text-[10px] text-gray-400">
+                <p className="mt-1.5 text-[10px] text-faint">
                   Minimum 6 characters
                 </p>
               </div>
@@ -1451,67 +945,13 @@ const ForgotPassword = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="
-                  group
-                  relative
-                  flex
-                  h-[48px]
-                  w-full
-                  items-center
-                  justify-center
-                  gap-2
-                  overflow-hidden
-                  rounded-[10px]
-                  bg-gradient-to-r
-                  from-[#7c3aed]
-                  via-[#c026d3]
-                  to-[#3b82f6]
-                  px-4
-                  text-[13px]
-                  font-bold
-                  text-white
-                  shadow-md
-                  shadow-purple-500/20
-                  transition-all
-                  duration-300
-                  hover:-translate-y-[1px]
-                  hover:shadow-lg
-                  hover:shadow-purple-500/25
-                  focus:outline-none
-                  focus:ring-4
-                  focus:ring-purple-500/20
-                  disabled:cursor-not-allowed
-                  disabled:translate-y-0
-                  disabled:opacity-60
-                "
+                className="btn btn-primary h-11 w-full"
               >
-                <span
-                  aria-hidden="true"
-                  className="
-                    absolute
-                    inset-0
-                    -translate-x-full
-                    bg-gradient-to-r
-                    from-transparent
-                    via-white/20
-                    to-transparent
-                    transition-transform
-                    duration-700
-                    group-hover:translate-x-full
-                  "
-                />
+                
 
                 {isLoading ? (
                   <>
-                    <Loader2
-                      size={17}
-                      className="
-                        relative
-                        z-10
-                        animate-spin
-                      "
-                      aria-hidden="true"
-                    />
+                    <span className="spinner relative z-10" aria-hidden="true" />
 
                     <span className="relative z-10">Resetting...</span>
                   </>
@@ -1519,17 +959,7 @@ const ForgotPassword = () => {
                   <>
                     <span className="relative z-10">Reset Password</span>
 
-                    <ArrowRight
-                      size={17}
-                      className="
-                        relative
-                        z-10
-                        transition-transform
-                        duration-300
-                        group-hover:translate-x-1
-                      "
-                      aria-hidden="true"
-                    />
+                    <i className="ri-arrow-right-line text-[17px]" aria-hidden="true" />
                   </>
                 )}
               </button>
@@ -1541,25 +971,16 @@ const ForgotPassword = () => {
                   type="button"
                   onClick={handleBack}
                   disabled={isLoading || isResending}
-                  className="
-                    text-[11px]
-                    font-medium
-                    text-gray-400
-                    transition-colors
-                    hover:text-purple-600
-                    hover:underline
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                  "
+                  className="text-[11px] font-medium text-faint transition-colors hover:text-accent hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  ← Use a different email
+                  Use a different email
                 </button>
               </div>
             </form>
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 };
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import AddNewPassword from "./Add";
 import PasswordHistoryModal from "./PasswordHistoryModal";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 /* ============================================================
    API CONFIG
@@ -597,39 +598,39 @@ export default function Hero({ token }) {
     if (!password) {
       return {
         status: "Unknown",
-        color: "text-gray-500",
-        bg: "bg-gray-100",
-        bar: "bg-gray-400",
+        color: "text-muted",
+        bg: "bg-sunken",
+        bar: "bg-faint",
         width: "w-[20%]",
       };
     }
 
     if (password.length >= 16) {
       return {
-        status: "Secure",
-        color: "text-[#34D399]",
-        bg: "bg-[#0B2E21]",
-        bar: "bg-[#34D399]",
-        width: "w-[85%]",
+        status: "Strong",
+        color: "text-ok",
+        bg: "bg-ok-tint",
+        bar: "bg-ok",
+        width: "w-full",
       };
     }
 
     if (password.length >= 12) {
       return {
         status: "Fair",
-        color: "text-[#FBBF24]",
-        bg: "bg-[#3A2A08]",
-        bar: "bg-[#FBBF24]",
+        color: "text-warn",
+        bg: "bg-warn-tint",
+        bar: "bg-warn",
         width: "w-[60%]",
       };
     }
 
     return {
       status: "Weak",
-      color: "text-[#F87171]",
-      bg: "bg-[#3F1013]",
-      bar: "bg-[#F87171]",
-      width: "w-[20%]",
+      color: "text-danger",
+      bg: "bg-danger-tint",
+      bar: "bg-danger",
+      width: "w-[25%]",
     };
   }, []);
 
@@ -644,16 +645,14 @@ export default function Hero({ token }) {
 
   const isDeletingTarget = deletingId === deleteTargetId;
 
+  useEscapeKey(cancelDelete, Boolean(deleteTarget) && !deletingId);
+
   /* ==========================================================
      RENDER
   ========================================================== */
 
   return (
-    <div className="min-h-screen bg-[#0A0810] font-['Inter',sans-serif] text-[#F5F3FF]">
-      {/* ======================================================
-          ADD / EDIT MODAL
-      ====================================================== */}
-
+    <div className="min-h-dvh bg-canvas text-ink">
       {openModal && (
         <AddNewPassword
           handleOpenModal={handleCloseModal}
@@ -663,13 +662,10 @@ export default function Hero({ token }) {
         />
       )}
 
-      {/* ======================================================
-          DELETE CONFIRMATION MODAL
-      ====================================================== */}
-
+      {/* DELETE CONFIRMATION */}
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4"
+          className="dialog-backdrop"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-dialog-title"
@@ -679,49 +675,31 @@ export default function Hero({ token }) {
             }
           }}
         >
-          <div className="w-full max-w-[420px] bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] shadow-2xl border border-white/10 p-[24px]">
-            <div className="w-[48px] h-[48px] rounded-full bg-[#3F1013] flex items-center justify-center mb-[16px]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#F87171"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-2-2-2-2H7c0-2-2-2-2-2V6" />
-                <path d="M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 2 2 2v2" />
-              </svg>
+          <div className="dialog max-w-[420px] p-6">
+            <div className="mb-4 grid h-10 w-10 place-items-center rounded-full bg-danger-tint text-danger">
+              <i className="ri-delete-bin-6-line text-[20px]" aria-hidden="true" />
             </div>
 
             <h3
               id="delete-dialog-title"
-              className="text-[20px] font-bold text-[#F5F3FF]"
+              className="text-lg font-semibold tracking-tight text-ink"
             >
-              Delete password?
+              Delete this password?
             </h3>
 
-            <p className="text-[14px] text-[#A8A4BD] mt-[8px] leading-6">
+            <p className="mt-2 text-sm leading-6 text-muted">
               {deleteTarget?.websiteName
-                ? `Are you sure you want to permanently delete the password for ${deleteTarget.websiteName}?`
-                : "Are you sure you want to permanently delete this password?"}
+                ? `The saved login for ${deleteTarget.websiteName} will be permanently removed. This can’t be undone.`
+                : "This saved login will be permanently removed. This can’t be undone."}
             </p>
 
-            <p className="text-[13px] text-[#F87171] mt-[12px]">
-              This action cannot be undone.
-            </p>
-
-            <div className="flex items-center justify-end gap-[10px] mt-[24px]">
+            <div className="mt-6 flex items-center justify-end gap-2">
               <button
                 type="button"
+                autoFocus
                 onClick={cancelDelete}
                 disabled={isDeletingTarget}
-                className="px-[16px] py-[10px] rounded-[8px] bg-white/5 hover:bg-white/10 text-[#F5F3FF] text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-secondary"
               >
                 Cancel
               </button>
@@ -730,15 +708,12 @@ export default function Hero({ token }) {
                 type="button"
                 onClick={() => handleDelete(deleteTargetId)}
                 disabled={!deleteTargetId || isDeletingTarget}
-                className="min-w-[90px] px-[16px] py-[10px] rounded-[8px] bg-[#F87171] hover:bg-[#B91C1C] text-white text-[14px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-[8px]"
+                className="btn btn-danger min-w-[96px]"
               >
                 {isDeletingTarget ? (
                   <>
-                    <span
-                      className="w-[15px] h-[15px] border-2 border-white/30 border-t-white rounded-full animate-spin"
-                      aria-hidden="true"
-                    />
-                    Deleting...
+                    <span className="spinner" aria-hidden="true" />
+                    Deleting
                   </>
                 ) : (
                   "Delete"
@@ -749,179 +724,172 @@ export default function Hero({ token }) {
         </div>
       )}
 
-      {/* ======================================================
-          MAIN
-      ====================================================== */}
+      <main className="mx-auto max-w-[1200px] px-4 pb-24 pt-10 sm:px-8">
+        {/* HEADER */}
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+              Passwords
+            </h1>
+            <p className="mt-1 text-sm text-muted">
+              {passwords.length === 0
+                ? "Nothing saved yet"
+                : `${passwords.length} saved ${passwords.length === 1 ? "login" : "logins"}, encrypted`}
+            </p>
+          </div>
 
-      <main className="max-w-[1200px] mx-auto px-[20px] md:px-[32px] pt-[48px] pb-[120px]">
-        {/* ====================================================
-            HEADER
-        ==================================================== */}
-
-        <div className="mb-[32px]">
-          <h2 className="text-[32px] font-bold font-['Manrope',sans-serif] text-[#F5F3FF]">
-            Password Vault
-          </h2>
-
-          <p className="text-[16px] text-[#D4D1E3] mt-[8px]">
-            {passwords.length} password
-            {passwords.length !== 1 ? "s" : ""} stored securely
-          </p>
+          <button
+            type="button"
+            onClick={handleOpenModal}
+            className="btn btn-primary"
+          >
+            <i className="ri-add-line text-[18px]" aria-hidden="true" />
+            Add password
+          </button>
         </div>
 
-        {/* ====================================================
-            ERROR
-        ==================================================== */}
-
+        {/* ERROR */}
         {error && (
-          <div className="bg-[#3F1013] border border-[#F87171] rounded-[12px] p-[16px] mb-[24px] flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[14px] font-semibold text-[#F87171]">
-                Error loading passwords
-              </p>
-
-              <p className="text-[13px] text-[#F87171]/80 mt-[4px]">{error}</p>
+          <div
+            role="alert"
+            className="mb-6 flex items-start justify-between gap-4 rounded-xl border border-danger/25 bg-danger-tint p-4"
+          >
+            <div className="flex items-start gap-3">
+              <i className="ri-error-warning-line mt-0.5 text-[18px] text-danger" aria-hidden="true" />
+              <div>
+                <p className="text-sm font-medium text-danger">
+                  Couldn’t load your passwords
+                </p>
+                <p className="mt-0.5 text-[13px] text-ink-soft">{error}</p>
+              </div>
             </div>
 
             <button
               type="button"
               onClick={fetchPasswords}
               disabled={loading}
-              className="text-[12px] font-semibold text-[#F87171] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer whitespace-nowrap"
+              className="btn btn-secondary h-8 px-3 text-[13px]"
             >
-              {loading ? "Loading..." : "Retry"}
+              {loading ? "Retrying" : "Retry"}
             </button>
           </div>
         )}
 
-        {/* ====================================================
-            SEARCH & FILTER
-        ==================================================== */}
-
+        {/* SEARCH & FILTER */}
         {!loading && passwords.length > 0 && (
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A4BD] text-[14px]">⌕</span>
+              <i
+                className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[17px] text-faint"
+                aria-hidden="true"
+              />
               <input
-                type="text"
+                type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by website, username, category, tag..."
-                className="w-full bg-white/[0.03] border border-white/10 text-[#F5F3FF] text-[14px] pl-9 pr-4 py-2.5 rounded-[12px] placeholder:text-[#726C8A] focus:outline-none focus:ring-2 focus:ring-[#8B72FF]/25 focus:border-[#8B72FF]/40"
+                placeholder="Search by site, username, category or tag"
+                aria-label="Search passwords"
+                className="field pl-10"
               />
             </div>
             <button
               type="button"
               onClick={() => setFavoritesOnly((v) => !v)}
-              className={`px-4 py-2.5 rounded-[12px] text-[13px] font-semibold border transition-colors whitespace-nowrap ${
+              aria-pressed={favoritesOnly}
+              className={`btn ${
                 favoritesOnly
-                  ? "bg-[#FBBF24]/15 border-[#FBBF24]/30 text-[#FBBF24]"
-                  : "bg-white/[0.03] border-white/10 text-[#A8A4BD] hover:text-white"
+                  ? "border-warn/40 bg-warn-tint text-warn"
+                  : "btn-secondary"
               }`}
             >
-              {favoritesOnly ? "★" : "☆"} Favorites
+              <i
+                className={`${favoritesOnly ? "ri-star-fill" : "ri-star-line"} text-[16px]`}
+                aria-hidden="true"
+              />
+              Favorites
             </button>
           </div>
         )}
 
-        {/* ====================================================
-            LOADING
-        ==================================================== */}
-
         {loading ? (
-          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[48px] text-center">
-            <div className="inline-block">
-              <div className="w-[40px] h-[40px] border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mb-[16px]" />
-
-              <p className="text-[16px] text-[#A8A4BD] font-medium">
-                Loading your vault...
-              </p>
-            </div>
+          <div
+            className="panel flex items-center justify-center gap-3 p-12 text-muted"
+            role="status"
+          >
+            <span className="spinner text-accent" aria-hidden="true" />
+            <p className="text-sm">Loading your passwords…</p>
           </div>
         ) : passwords.length === 0 ? (
-          /* ==================================================
-             EMPTY STATE
-          ================================================== */
-
-          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[64px] text-center">
-            <div className="w-[56px] h-[56px] bg-[#8B72FF]/15 rounded-full flex items-center justify-center mx-auto mb-[24px] text-[24px]">
-              🔐
+          <div className="panel px-6 py-16 text-center">
+            <div className="mx-auto mb-5 grid h-12 w-12 place-items-center rounded-xl bg-sunken text-ink-soft">
+              <i className="ri-key-2-line text-[24px]" aria-hidden="true" />
             </div>
-
-            <h3 className="text-[20px] font-semibold text-[#F5F3FF] mb-[8px]">
-              No passwords yet
-            </h3>
-
-            <p className="text-[16px] text-[#A8A4BD] mb-[24px]">
-              Start by adding your first password to get started
+            <h2 className="text-lg font-semibold tracking-tight">
+              No passwords saved yet
+            </h2>
+            <p className="mx-auto mt-1.5 max-w-sm text-sm text-muted">
+              Add a login and it’s stored encrypted, ready to copy when you need it.
             </p>
-
             <button
               type="button"
               onClick={handleOpenModal}
-              className="bg-[#8B72FF] hover:bg-[#765be8] text-white px-[24px] py-[12px] rounded-[8px] text-[14px] font-semibold cursor-pointer transition-colors"
+              className="btn btn-primary mt-6"
             >
-              + Add your first password
+              <i className="ri-add-line text-[18px]" aria-hidden="true" />
+              Add your first password
             </button>
           </div>
         ) : filteredPasswords.length === 0 ? (
-          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 p-[48px] text-center">
-            <p className="text-[15px] text-[#A8A4BD]">No passwords match your search or filter.</p>
+          <div className="panel px-6 py-14 text-center">
+            <i className="ri-search-line text-[24px] text-faint" aria-hidden="true" />
+            <p className="mt-2 text-sm font-medium text-ink">No matches</p>
+            <p className="mt-1 text-sm text-muted">
+              Try a different search term or turn off the favorites filter.
+            </p>
           </div>
         ) : (
-          /* ==================================================
-             PASSWORD TABLE
-          ================================================== */
-
-          <div className="bg-[#130F1F]/90 backdrop-blur-xl rounded-[16px] border border-white/10 shadow-[0_4px_20px_rgba(139,114,255,0.08)] overflow-hidden">
+          <div className="panel overflow-hidden">
             {/* TABLE HEADER */}
-
-            <div className="hidden md:grid grid-cols-12 gap-[16px] px-[24px] py-[16px] border-b border-white/10 bg-[#0A0810]/50 text-[12px] font-semibold text-[#A8A4BD] uppercase tracking-[0.02em]">
+            <div
+              role="row"
+              className="hidden grid-cols-12 gap-4 border-b border-line bg-sunken/60 px-6 py-3 text-xs font-medium text-muted md:grid"
+            >
               <div className="col-span-3">Website</div>
-
               <div className="col-span-2">Username</div>
-
               <div className="col-span-3">Password</div>
-
-              <div className="col-span-2">Security</div>
-
+              <div className="col-span-2">Strength</div>
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
-            {/* ITEMS */}
-
-            <div className="flex flex-col divide-y divide-white/10">
+            <ul className="divide-y divide-line">
               {filteredPasswords.map((item, index) => {
                 const realId = getPasswordId(item);
-
                 const id = realId || `fallback-${index}`;
-
                 const security = getSecurityStatus(item?.password);
                 const urlWarning = getUrlWarning(item?.url);
-
                 const isVisible = Boolean(visiblePasswords[id]);
-
                 const isDeleting = deletingId === id;
+                const siteName = item?.websiteName || "Unnamed website";
 
                 return (
-                  <div
+                  <li
                     key={id}
-                    className={`grid grid-cols-1 md:grid-cols-12 gap-[16px] items-center px-[20px] md:px-[24px] py-[20px] hover:bg-white/[0.04] transition-colors ${
+                    className={`grid grid-cols-1 items-center gap-3 px-4 py-4 transition-colors hover:bg-canvas/70 md:grid-cols-12 md:gap-4 md:px-6 ${
                       isDeleting ? "opacity-60" : ""
                     }`}
                   >
-                    {/* ==================================================
-                        WEBSITE
-                    ================================================== */}
-
-                    <div className="md:col-span-3 flex items-center gap-[12px] min-w-0">
-                      <div className="w-[40px] h-[40px] rounded-[8px] bg-[#8B72FF]/15 flex items-center justify-center flex-shrink-0">
-                        🔗
-                      </div>
+                    {/* WEBSITE */}
+                    <div className="flex min-w-0 items-center gap-3 md:col-span-3">
+                      <span
+                        className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg bg-accent-tint text-[15px] font-semibold text-accent"
+                        aria-hidden="true"
+                      >
+                        {siteName.charAt(0).toUpperCase()}
+                      </span>
 
                       <div className="min-w-0">
-                        <h3 className="text-[14px] font-semibold text-[#F5F3FF] truncate">
-                          {item?.websiteName || "Unnamed Website"}
+                        <h3 className="truncate text-sm font-medium text-ink">
+                          {siteName}
                         </h3>
 
                         {item?.url ? (
@@ -933,344 +901,173 @@ export default function Hero({ token }) {
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[12px] text-[#8B72FF] hover:text-[#765be8] hover:underline truncate block"
+                            className="block truncate text-xs text-muted hover:text-accent hover:underline"
                             title={item.url}
                           >
                             {item.url}
                           </a>
                         ) : (
-                          <p className="text-[12px] text-[#A8A4BD]">No URL</p>
+                          <p className="text-xs text-faint">No URL</p>
                         )}
 
                         {urlWarning ? (
                           <div
-                            className="mt-[4px] inline-flex items-center gap-[4px] text-[11px] font-medium text-[#FBBF24] bg-[#3A2A08] px-[6px] py-[2px] rounded-[6px]"
+                            className="mt-1 inline-flex max-w-full items-center gap-1 rounded bg-warn-tint px-1.5 py-0.5 text-[11px] font-medium text-warn"
                             title={urlWarning}
                           >
-                            <span>⚠️</span>
-                            <span className="truncate max-w-[180px]">
-                              {urlWarning}
-                            </span>
+                            <i className="ri-alert-line" aria-hidden="true" />
+                            <span className="max-w-[180px] truncate">{urlWarning}</span>
                           </div>
                         ) : null}
                       </div>
                     </div>
 
-                    {/* ==================================================
-                        USERNAME
-                    ================================================== */}
+                    {/* USERNAME */}
+                    <div className="flex min-w-0 items-center gap-1 md:col-span-2">
+                      <span
+                        className="flex-1 truncate text-sm text-ink-soft"
+                        title={item?.username || ""}
+                      >
+                        {item?.username || "—"}
+                      </span>
 
-                    <div className="md:col-span-2 min-w-0">
-                      <div className="flex items-center gap-[6px]">
-                        <span
-                          className="text-[14px] text-[#D4D1E3] truncate flex-1"
-                          title={item?.username || ""}
-                        >
-                          {item?.username || "—"}
-                        </span>
-
-                        {item?.username && (
-                          <button
-                            type="button"
-                            onClick={() => copyUsername(item.username, id)}
-                            disabled={isDeleting}
-                            className={`p-[6px] rounded-[6px] flex-shrink-0 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                              copiedUsernameId === id
-                                ? "text-[#34D399] bg-[#0B2E21]"
-                                : "text-[#8B72FF] hover:bg-[#8B72FF]/15"
-                            }`}
-                            title={
-                              copiedUsernameId === id
-                                ? "Copied"
-                                : "Copy username"
-                            }
-                            aria-label="Copy username"
-                          >
-                            {copiedUsernameId === id ? (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="15"
-                                height="15"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                              >
-                                <path d="M20 6L9 17l-5-5" />
-                              </svg>
-                            ) : (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="15"
-                                height="15"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden="true"
-                              >
-                                <rect
-                                  width="14"
-                                  height="14"
-                                  x="8"
-                                  y="8"
-                                  rx="2"
-                                />
-
-                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                              </svg>
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* ==================================================
-                        PASSWORD
-                    ================================================== */}
-
-                    <div className="md:col-span-3 min-w-0">
-                      <div className="flex items-center gap-[6px]">
-                        <div className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-[8px] px-[10px] py-[8px]">
-                          <span className="text-[13px] font-mono truncate block">
-                            {!item?.password
-                              ? "Unavailable"
-                              : isVisible
-                                ? item.password
-                                : "••••••••••••"}
-                          </span>
-                        </div>
-
-                        {/* SHOW / HIDE */}
-
+                      {item?.username && (
                         <button
                           type="button"
-                          onClick={() => togglePasswordVisibility(id)}
-                          disabled={!item?.password || isDeleting}
-                          className="p-[8px] rounded-[6px] text-[#8B72FF] hover:bg-[#8B72FF]/15 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                          title={isVisible ? "Hide password" : "Show password"}
-                          aria-label={
-                            isVisible ? "Hide password" : "Show password"
-                          }
-                        >
-                          {isVisible ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="17"
-                              height="17"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                              <circle cx="12" cy="12" r="3" />
-                            </svg>
-                          ) : (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="17"
-                              height="17"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d="M3 3l18 18" />
-                              <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
-                              <path d="M9.9 4.2A10.5 10.5 0 0 1 12 4c7 0 10 7 10 7a18 18 0 0 1-3.2 4.5" />
-                              <path d="M6.6 6.6C3.8 8.5 2 12 2 12s3 7 10 7a10 10 0 0 0 3-.4" />
-                            </svg>
-                          )}
-                        </button>
-
-                        {/* COPY PASSWORD */}
-
-                        <button
-                          type="button"
-                          onClick={() => copyPassword(item?.password, id)}
-                          disabled={!item?.password || isDeleting}
-                          className={`p-[8px] rounded-[6px] cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                            copiedId === id
-                              ? "text-[#34D399] bg-[#0B2E21]"
-                              : "text-[#8B72FF] hover:bg-[#8B72FF]/15"
+                          onClick={() => copyUsername(item.username, id)}
+                          disabled={isDeleting}
+                          className={`icon-btn flex-shrink-0 ${
+                            copiedUsernameId === id ? "!text-ok" : ""
                           }`}
-                          title="Copy password"
-                          aria-label="Copy password"
+                          title={copiedUsernameId === id ? "Copied" : "Copy username"}
+                          aria-label="Copy username"
                         >
-                          {copiedId === id ? (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="17"
-                              height="17"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <path d="M20 6L9 17l-5-5" />
-                            </svg>
-                          ) : (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="17"
-                              height="17"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              aria-hidden="true"
-                            >
-                              <rect width="14" height="14" x="8" y="8" rx="2" />
-
-                              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                            </svg>
-                          )}
+                          <i
+                            className={copiedUsernameId === id ? "ri-check-line" : "ri-file-copy-line"}
+                            aria-hidden="true"
+                          />
                         </button>
-                      </div>
+                      )}
                     </div>
 
-                    {/* ==================================================
-                        SECURITY
-                    ================================================== */}
+                    {/* PASSWORD */}
+                    <div className="flex min-w-0 items-center gap-1 md:col-span-3">
+                      <div className="min-w-0 flex-1 rounded-md border border-line bg-canvas px-2.5 py-1.5">
+                        <span className="block truncate font-mono text-[13px] text-ink">
+                          {!item?.password
+                            ? "Unavailable"
+                            : isVisible
+                              ? item.password
+                              : "••••••••••••"}
+                        </span>
+                      </div>
 
-                    <div className="md:col-span-2 flex items-center gap-[8px]">
-                      <div className="flex-1 h-[6px] bg-[#15121F] rounded-full overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => togglePasswordVisibility(id)}
+                        disabled={!item?.password || isDeleting}
+                        className="icon-btn flex-shrink-0"
+                        title={isVisible ? "Hide password" : "Show password"}
+                        aria-label={isVisible ? "Hide password" : "Show password"}
+                        aria-pressed={isVisible}
+                      >
+                        <i
+                          className={isVisible ? "ri-eye-off-line" : "ri-eye-line"}
+                          aria-hidden="true"
+                        />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => copyPassword(item?.password, id)}
+                        disabled={!item?.password || isDeleting}
+                        className={`icon-btn flex-shrink-0 ${
+                          copiedId === id ? "!text-ok" : ""
+                        }`}
+                        title={copiedId === id ? "Copied" : "Copy password"}
+                        aria-label="Copy password"
+                      >
+                        <i
+                          className={copiedId === id ? "ri-check-line" : "ri-file-copy-line"}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
+
+                    {/* STRENGTH */}
+                    <div className="flex items-center gap-2.5 md:col-span-2">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-sunken">
                         <div
-                          className={`h-full ${security.bar} ${security.width} rounded-full`}
+                          className={`h-full rounded-full ${security.bar} ${security.width}`}
                         />
                       </div>
-
                       <span
-                        className={`px-[8px] py-[4px] rounded-[12px] text-[10px] font-bold uppercase whitespace-nowrap ${security.bg} ${security.color}`}
+                        className={`w-12 text-xs font-medium ${security.color}`}
                       >
                         {security.status}
                       </span>
                     </div>
 
-                    {/* ==================================================
-                        ACTIONS
-                    ================================================== */}
-
-                    <div className="md:col-span-2 flex items-center justify-end gap-[4px]">
-                      {/* FAVORITE */}
-
+                    {/* ACTIONS */}
+                    <div className="flex items-center justify-end gap-0.5 md:col-span-2">
                       <button
                         type="button"
                         onClick={() => toggleFavorite(item)}
                         disabled={togglingFavoriteId === realId}
-                        className={`p-[8px] rounded-[6px] transition-colors cursor-pointer disabled:opacity-40 ${
-                          item.isFavorite
-                            ? "text-[#FBBF24] bg-[#FBBF24]/10 hover:bg-[#FBBF24]/20"
-                            : "text-[#A8A4BD] hover:text-[#FBBF24] hover:bg-[#FBBF24]/10"
-                        }`}
-                        aria-label="Toggle favorite"
+                        className={`icon-btn ${item.isFavorite ? "!text-warn" : ""}`}
+                        aria-label={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                        aria-pressed={Boolean(item.isFavorite)}
                         title={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
                       >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill={item.isFavorite ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
+                        <i
+                          className={item.isFavorite ? "ri-star-fill" : "ri-star-line"}
+                          aria-hidden="true"
+                        />
                       </button>
-
-                      {/* EDIT */}
 
                       <button
                         type="button"
                         onClick={() => handleEdit(item)}
                         disabled={isDeleting || !realId}
-                        className="text-[#8B72FF] hover:text-[#765be8] hover:bg-[#8B72FF]/15 disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
+                        className="icon-btn"
                         aria-label="Edit password"
                         title="Edit"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="17"
-                          height="17"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 20h9" />
-                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
-                        </svg>
+                        <i className="ri-pencil-line" aria-hidden="true" />
                       </button>
 
-                      {/* DELETE */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setHistoryTarget({ id: realId, websiteName: item.websiteName })
+                        }
+                        disabled={!realId}
+                        className="icon-btn"
+                        aria-label="View password history"
+                        title="History"
+                      >
+                        <i className="ri-history-line" aria-hidden="true" />
+                      </button>
 
                       <button
                         type="button"
                         onClick={() => confirmDelete(item)}
                         disabled={isDeleting || !realId}
-                        className="text-[#F87171] hover:text-[#B91C1C] hover:bg-[#3F1013] disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
+                        className="icon-btn hover:!bg-danger-tint hover:!text-danger"
                         aria-label="Delete password"
-                        title={isDeleting ? "Deleting..." : "Delete"}
+                        title={isDeleting ? "Deleting…" : "Delete"}
                       >
                         {isDeleting ? (
-                          <span
-                            className="block w-[17px] h-[17px] border-2 border-[#F87171]/30 border-t-[#F87171] rounded-full animate-spin"
-                            aria-hidden="true"
-                          />
+                          <span className="spinner h-4 w-4" aria-hidden="true" />
                         ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="17"
-                            height="17"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            aria-hidden="true"
-                          >
-                            <path d="M3 6h18" />
-                            <path d="M19 6v14c0 1-2-2-2-2H7c0-2-2-2-2-2V6" />
-                            <path d="M8 6V4c0-1.1.9-2 2-2h4c1.1 0 2 2 2 2v2" />
-                          </svg>
+                          <i className="ri-delete-bin-6-line" aria-hidden="true" />
                         )}
                       </button>
-
-                      {/* HISTORY */}
-
-                      <button
-                        type="button"
-                        onClick={() => setHistoryTarget({ id: realId, websiteName: item.websiteName })}
-                        disabled={!realId}
-                        className="text-[#A8A4BD] hover:text-white hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed p-[8px] rounded-[6px] transition-colors cursor-pointer"
-                        aria-label="View password history"
-                        title="History"
-                      >
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 3v5h5" />
-                          <path d="M3.05 13a9 9 0 1 0 2.13-6.36L3 8" />
-                          <path d="M12 7v5l4 2" />
-                        </svg>
-                      </button>
                     </div>
-                  </div>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         )}
 
@@ -1283,86 +1080,6 @@ export default function Hero({ token }) {
           />
         )}
       </main>
-
-      {/* ======================================================
-          ANDROID STYLE FLOATING ACTION BUTTON
-      ====================================================== */}
-
-      {!openModal && !deleteTarget && (
-        <button
-          type="button"
-          onClick={handleOpenModal}
-          aria-label="Add new password"
-          title="Add New Password"
-          className="
-            fixed
-            right-[20px]
-            bottom-[20px]
-            md:right-[32px]
-            md:bottom-[32px]
-            z-[50]
-
-            h-[56px]
-            w-[56px]
-            md:w-auto
-            md:min-w-[56px]
-
-            md:px-[20px]
-
-            rounded-full
-            md:rounded-[16px]
-
-            bg-[#8B72FF]
-            hover:bg-[#765be8]
-            active:bg-[#5c46c4]
-
-            text-white
-
-            flex
-            items-center
-            justify-center
-            gap-[8px]
-
-            shadow-[0_8px_24px_rgba(139,114,255,0.35)]
-            hover:shadow-[0_10px_28px_rgba(139,114,255,0.45)]
-
-            transition-all
-            duration-200
-            ease-out
-
-            hover:-translate-y-[2px]
-            active:translate-y-0
-
-            focus:outline-none
-            focus-visible:ring-4
-            focus-visible:ring-[#8B72FF]/30
-
-            cursor-pointer
-            select-none
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="flex-shrink-0"
-          >
-            <path d="M12 5v14" />
-            <path d="M5 12h14" />
-          </svg>
-
-          <span className="hidden md:inline text-[14px] font-semibold">
-            Add New
-          </span>
-        </button>
-      )}
     </div>
   );
 }

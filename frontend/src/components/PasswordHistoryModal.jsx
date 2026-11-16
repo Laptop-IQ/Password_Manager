@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import useEscapeKey from "../hooks/useEscapeKey";
 
 const API_BASE = (
   import.meta.env.VITE_API_BASE_URL ||
@@ -48,42 +49,48 @@ export default function PasswordHistoryModal({ passwordId, websiteName, token, o
     }
   };
 
+  useEscapeKey(onClose, true);
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-8 overflow-y-auto"
+      className="dialog-backdrop"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dialog-title"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose?.();
       }}
     >
-      <div className="w-full max-w-[440px] bg-[#130F1F]/95 backdrop-blur-xl rounded-[20px] shadow-2xl border border-white/10 my-auto">
-        <div className="p-6 border-b border-white/10">
-          <h3 className="text-[18px] font-bold text-[#F5F3FF]">Password history</h3>
-          <p className="text-[13px] text-[#A8A4BD] mt-1">{websiteName}</p>
+      <div className="dialog max-w-[440px]">
+        <div className="flex items-start justify-between gap-4 border-b border-line p-6">
+          <div className="min-w-0">
+            <h3 id="dialog-title" className="text-lg font-semibold tracking-tight text-ink">Password history</h3>
+            <p className="text-[13px] text-muted mt-1">{websiteName}</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="icon-btn -mr-2 -mt-1 h-9 w-9 shrink-0 text-[22px]"><i className="ri-close-line" aria-hidden="true" /></button>
         </div>
 
         <div className="p-6 max-h-[60vh] overflow-y-auto">
           {loading ? (
             <div className="text-center py-6">
-              <div className="w-8 h-8 border-4 border-white/10 border-t-[#8B72FF] rounded-full animate-spin mx-auto" />
+              <div className="spinner w-8 h-8 mx-auto text-accent" />
             </div>
           ) : history.length === 0 ? (
-            <p className="text-[13px] text-[#A8A4BD] text-center py-4">
-              No previous passwords recorded yet — history is tracked from your next password change onward.
+            <p className="text-[13px] text-muted text-center py-4">
+              No earlier passwords yet. Changes are tracked from the next time you update this password.
             </p>
           ) : (
             <div className="space-y-2.5">
               {history.map((entry, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between gap-3 bg-black/20 border border-white/10 rounded-[12px] px-4 py-3"
+                  className="flex items-center justify-between gap-3 bg-canvas border border-line rounded-lg px-4 py-3"
                 >
                   <div className="min-w-0">
-                    <p className="font-mono text-[13px] text-[#F5F3FF] truncate">
+                    <p className="font-mono text-[13px] text-ink truncate">
                       {revealedIndex === i ? entry.password : "•".repeat(Math.max(entry.password?.length || 8, 8))}
                     </p>
-                    <p className="text-[11px] text-[#A8A4BD] mt-0.5">
+                    <p className="text-[11px] text-muted mt-0.5">
                       Changed {new Date(entry.changedAt).toLocaleString()}
                     </p>
                   </div>
@@ -91,17 +98,15 @@ export default function PasswordHistoryModal({ passwordId, websiteName, token, o
                     <button
                       type="button"
                       onClick={() => setRevealedIndex(revealedIndex === i ? null : i)}
-                      className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
+                      className="icon-btn h-8 w-8 text-[16px]"
                     >
-                      {revealedIndex === i ? "Hide" : "Show"}
+                      <i className={revealedIndex === i ? "ri-eye-off-line" : "ri-eye-line"} aria-hidden="true" /><span className="sr-only">{revealedIndex === i ? "Hide" : "Show"}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => copy(entry.password)}
-                      className="text-[11px] text-[#C9BFFF] hover:text-white font-medium"
-                    >
-                      Copy
-                    </button>
+                      className="icon-btn h-8 w-8 text-[16px]"
+                    ><i className="ri-file-copy-line" aria-hidden="true" /><span className="sr-only">Copy</span></button>
                   </div>
                 </div>
               ))}
@@ -109,11 +114,11 @@ export default function PasswordHistoryModal({ passwordId, websiteName, token, o
           )}
         </div>
 
-        <div className="bg-black/20 border-t border-white/10 p-5 rounded-b-[20px] flex justify-end">
+        <div className="bg-sunken/50 border-t border-line px-6 py-4 rounded-b-[14px] flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 text-[14px] font-medium text-[#F5F3FF] hover:bg-white/5 rounded-[10px]"
+            className="btn btn-secondary"
           >
             Close
           </button>
