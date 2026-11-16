@@ -304,3 +304,7 @@
 }
 /* Route content fades in once, so page swaps don't flash */
 .page-enter { animation: fade-in 0.2s ease-out; }
+
+/* Hide scrollbars on horizontally scrollable strips (still scrollable by touch/wheel) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

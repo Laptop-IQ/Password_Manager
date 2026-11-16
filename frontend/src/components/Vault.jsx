@@ -615,7 +615,7 @@ export default function Vault({ token }) {
         <div
           role="tablist"
           aria-label="Vault sections"
-          className="mb-6 flex gap-1 overflow-x-auto border-b border-line"
+          className="no-scrollbar mb-6 flex gap-1 overflow-x-auto border-b border-line"
         >
           {TABS.map((tab) => {
             const active = activeTab === tab.id;
